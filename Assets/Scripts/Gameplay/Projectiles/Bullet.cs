@@ -18,6 +18,7 @@ namespace Game.Gameplay.Projectiles
         private int _bounces;
         private Shooter _owner;
         private float _life;
+        private enum TankType { Player, Enemy};
 
         void Awake()
         {
@@ -48,7 +49,8 @@ namespace Game.Gameplay.Projectiles
             if (ln == "Player" || ln == "Enemy" || ln == "Mines")
             {
                 var h = col.collider.GetComponentInParent<Health>();
-                if (h) h.Kill();
+                if (h && playerOrEnemy(col.collider.gameObject) != playerOrEnemy(gameObject)) 
+                    h.Kill();
                 Despawn();
                 return;
             }
@@ -56,10 +58,6 @@ namespace Game.Gameplay.Projectiles
             // Ricochet on walls
             if (ln == "Walls")
             {
-                // reflect velocity about the contact normal
-                //Vector2 n = col.contacts[0].normal;
-                //_rb.linearVelocity = Vector2.Reflect(_rb.linearVelocity, n);
-
                 _bounces++;
                 if (_bounces >= maxBounces) 
                     Despawn();
@@ -72,8 +70,24 @@ namespace Game.Gameplay.Projectiles
 
         void Despawn()
         {
-            _owner?.NotifyBulletDespawned();
-            Destroy(gameObject);
+            _owner?.ReleaseBullet(this);
+        }
+
+        private TankType playerOrEnemy(GameObject obj)
+        {
+            string layerStr = LayerMask.LayerToName(obj.layer);
+
+            switch (layerStr)
+            {
+                case "PlayerBullet":
+                case "Player":
+                    return TankType.Player;
+                case "EnemyBullet":
+                case "Enemy":
+                    return TankType.Enemy;
+                default:
+                    return 0;
+            }
         }
     }
 }

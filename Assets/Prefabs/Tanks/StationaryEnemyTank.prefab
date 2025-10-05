@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   muzzle: {fileID: 4699912395469050728}
   bulletPrefab: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
-  muzzleSpeed: 14
+  muzzleSpeed: 6
   cooldown: 0.25
   maxActive: 4
   isPlayer: 0
@@ -256,6 +256,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   worldCamera: {fileID: 0}
+  spriteFaces: 1
+  extraDegrees: 0
 --- !u!1 &5488301218007440225
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,12 +11,17 @@ namespace Game.Core
     {
         private readonly T _prefab;
         private readonly Transform _parent;
-        private readonly Stack<T> _pool = new Stack<T>();
+        private readonly Stack<T> _pool;
 
         public ObjectPool(T prefab, Transform parent = null, int initial = 0)
         {
             _prefab = prefab;
             _parent = parent;
+
+            if (initial > 0)
+                _pool = new Stack<T>(initial);
+            else
+                _pool = new Stack<T>();     
         }
 
         public T Get()

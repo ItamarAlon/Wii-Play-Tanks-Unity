@@ -4,14 +4,12 @@
 
 using UnityEngine;
 using Game.Gameplay.Projectiles;
+using UnityEngine.Pool;
 
 namespace Game.Gameplay.Tanks.Shared
 {
     public class Shooter : MonoBehaviour
     {
-        private const int PLAYER_BULLET_LAYER = 8;
-        private const int ENEMY_BULLET_LAYER = 9;
-
         public Transform muzzle;
         public Bullet bulletPrefab;
         public float muzzleSpeed = 14f;
@@ -21,34 +19,55 @@ namespace Game.Gameplay.Tanks.Shared
 
         private float _cooldownTimer;
         private int _active;
+        private ObjectPool<Bullet> _bulletPool;
+
+        private void Awake()
+        {
+            _bulletPool = new ObjectPool<Bullet>(
+                createFunc: createBullet, 
+                actionOnGet: b => b.gameObject.SetActive(true),
+                actionOnRelease: b => b.gameObject.SetActive(false));
+        }
 
         public void TryFire(Vector2 dir)
         {
             if (_cooldownTimer > 0f) return;
-            if (isPlayer && _active >= maxActive) return;
+            if (_active >= maxActive) return;
             if (!bulletPrefab || !muzzle) return;
 
-            var b = Instantiate(bulletPrefab, muzzle.position, Quaternion.identity);
-            b.SetOwner(this);
+            Bullet bullet = _bulletPool.Get();
+            bullet.transform.position = muzzle.position;
 
-            if (isPlayer)
-                b.gameObject.layer = PLAYER_BULLET_LAYER;
-            else
-                b.gameObject.layer = ENEMY_BULLET_LAYER;
-
-            b.Launch(dir.normalized * muzzleSpeed);
+            bullet.Launch(dir.normalized * muzzleSpeed);
             _active++;
             _cooldownTimer = cooldown;
         }
 
-        public void NotifyBulletDespawned()
+        public void ReleaseBullet(Bullet bullet)
         {
-            if (_active > 0) _active--;
+            if (_active > 0)
+            {
+                _active--;
+                _bulletPool.Release(bullet);
+            }
         }
 
         void Update()
         {
             if (_cooldownTimer > 0f) _cooldownTimer -= Time.deltaTime;
+        }
+
+        private Bullet createBullet()
+        {
+            Bullet bullet = Instantiate(bulletPrefab, muzzle.position, Quaternion.identity);
+            bullet.SetOwner(this);
+
+            if (isPlayer)
+                bullet.gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
+            else
+                bullet.gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
+
+            return bullet;
         }
     }
 }
