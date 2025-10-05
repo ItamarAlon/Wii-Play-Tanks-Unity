@@ -42,14 +42,13 @@ namespace Game.Gameplay.Projectiles
         }
 
         void OnCollisionEnter2D(Collision2D col)
-        {
+        {          
             string ln = LayerMask.LayerToName(col.collider.gameObject.layer);
-
             // Hit a tank or a mine ? kill & despawn
             if (ln == "Player" || ln == "Enemy" || ln == "Mines")
             {
                 var h = col.collider.GetComponentInParent<Health>();
-                if (h && playerOrEnemy(col.collider.gameObject) != playerOrEnemy(gameObject)) 
+                if (h && playerOrEnemy(col.collider.gameObject) != playerOrEnemy(gameObject))
                     h.Kill();
                 Despawn();
                 return;
@@ -59,7 +58,7 @@ namespace Game.Gameplay.Projectiles
             if (ln == "Walls")
             {
                 _bounces++;
-                if (_bounces >= maxBounces) 
+                if (_bounces >= maxBounces)
                     Despawn();
                 return;
             }

@@ -12,21 +12,25 @@ namespace Game.Gameplay.Tanks.Shared
     {
         public Transform muzzle;
         public Bullet bulletPrefab;
-        public float muzzleSpeed = 14f;
+        public float muzzleSpeed = 6f;
         public float cooldown = 0.25f;
         public int maxActive = 4;
         public bool isPlayer;
 
         private float _cooldownTimer;
         private int _active;
+        private Collider2D _collider;
         private ObjectPool<Bullet> _bulletPool;
 
         private void Awake()
         {
             _bulletPool = new ObjectPool<Bullet>(
                 createFunc: createBullet, 
-                actionOnGet: b => b.gameObject.SetActive(true),
-                actionOnRelease: b => b.gameObject.SetActive(false));
+                actionOnGet: activateWhenGettingBulletFromPool,
+                actionOnRelease: b => b.gameObject.SetActive(false),
+                maxSize: maxActive);
+
+            _collider = GetComponentInParent<Collider2D>();
         }
 
         public void TryFire(Vector2 dir)
@@ -36,7 +40,6 @@ namespace Game.Gameplay.Tanks.Shared
             if (!bulletPrefab || !muzzle) return;
 
             Bullet bullet = _bulletPool.Get();
-            bullet.transform.position = muzzle.position;
 
             bullet.Launch(dir.normalized * muzzleSpeed);
             _active++;
@@ -68,6 +71,19 @@ namespace Game.Gameplay.Tanks.Shared
                 bullet.gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
 
             return bullet;
+        }
+
+        private void activateWhenGettingBulletFromPool(Bullet bullet)
+        {
+            ignoreCollisionWithBullet(bullet);
+            bullet.transform.position = muzzle.position;
+            bullet.gameObject.SetActive(true);
+        }
+
+        private void ignoreCollisionWithBullet(Bullet bullet)
+        {
+            Collider2D bulletCollider = bullet.GetComponent<Collider2D>();
+            Physics2D.IgnoreCollision(bulletCollider, _collider);
         }
     }
 }
