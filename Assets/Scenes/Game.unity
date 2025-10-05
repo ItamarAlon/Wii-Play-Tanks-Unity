@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingLives: 3
   StageList:
-  - {fileID: 11400000, guid: 4ca3ba19b5cba434dbe4af3fe06d5063, type: 2}
+  - {fileID: 11400000, guid: cff4016d20172ce478a82dea3f1f2dbe, type: 2}
   levelLoader: {fileID: 1932649226}
   hud: {fileID: 642477475}
   stageManager: {fileID: 2876292}
