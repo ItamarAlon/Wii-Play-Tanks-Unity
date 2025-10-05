@@ -48,7 +48,7 @@ namespace Game.Gameplay.Projectiles
             if (ln == "Player" || ln == "Enemy" || ln == "Mines")
             {
                 var h = col.collider.GetComponentInParent<Health>();
-                if (h && playerOrEnemy(col.collider.gameObject) != playerOrEnemy(gameObject))
+                if (h)
                     h.Kill();
                 Despawn();
                 return;

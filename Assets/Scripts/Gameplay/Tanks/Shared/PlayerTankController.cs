@@ -32,10 +32,7 @@ namespace Game.Gameplay.Tanks.Shared
 
             if (Input.GetKey(fireKey) && shooter && shooter.muzzle)
             {
-                Vector3 mouse = Input.mousePosition;
-                Vector3 world = _cam.ScreenToWorldPoint(mouse);
-                Vector2 dir = (world - shooter.muzzle.position);
-                shooter.TryFire(dir);
+                shooter.TryFire(shooter.muzzle.up);
             }
 
             if (Input.GetKeyDown(mineKey) && minePrefab)
