@@ -75,7 +75,7 @@ namespace Game.Gameplay.Tanks.Shared
 
         private void activateWhenGettingBulletFromPool(Bullet bullet)
         {
-            //ignoreCollisionWithBullet(bullet);
+            ignoreCollisionWithBullet(bullet);
             bullet.transform.position = muzzle.position;
             bullet.gameObject.SetActive(true);
         }

@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 2
   accel: 20
 --- !u!114 &8163819590028883333
 MonoBehaviour:
@@ -169,7 +169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   muzzle: {fileID: 4699912395469050728}
   bulletPrefab: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
-  muzzleSpeed: 6
+  muzzleSpeed: 3.4
   cooldown: 0.25
   maxActive: 4
   isPlayer: 1

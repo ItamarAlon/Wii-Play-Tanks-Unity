@@ -166,6 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingLives: 3
   StageList:
+  - {fileID: 11400000, guid: e92be210d4fd3e8438b8a96283d09950, type: 2}
   - {fileID: 11400000, guid: cff4016d20172ce478a82dea3f1f2dbe, type: 2}
   levelLoader: {fileID: 1932649226}
   hud: {fileID: 642477475}
@@ -519,8 +520,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTankPrefab: {fileID: 290090536791198282, guid: 556c58a5c0ae843459addd1d4fb68290, type: 3}
-  enemyStationaryPrefab: {fileID: 290090536791198282, guid: d7bb30edf9561ba4084003d8b8458604, type: 3}
-  enemyMovingPrefab: {fileID: 290090536791198282, guid: d55e8c72c8242ab4d8b09742f9b0fc67, type: 3}
+  enemyStationaryPrefab: {fileID: 290090536791198282, guid: 04ca8ae1eb2537c44a0380488fcb63e5, type: 3}
+  enemyMovingPrefab: {fileID: 290090536791198282, guid: 3255fa02a0c753f40b61bc7e31dd1943, type: 3}
   StageInstance: {fileID: 0}
   PlayerInstance: {fileID: 0}
   EnemyInstances: []
