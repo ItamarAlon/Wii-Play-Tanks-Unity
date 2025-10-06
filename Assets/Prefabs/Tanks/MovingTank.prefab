@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
   - component: {fileID: 7621185323303055684}
+  - component: {fileID: 3743735772750004465}
   m_Layer: 7
   m_Name: MovingTank
   m_TagString: Enemy
@@ -170,6 +171,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turret: {fileID: 4478932648053384618}
   chaseSpeed: 1
+--- !u!195 &3743735772750004465
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +316,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 95386819
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: be4edc3ac8b033444a0ddbe80277473e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -411,7 +434,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 95386819
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: e06cf71834d54cb4a8ba8911624bd84d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

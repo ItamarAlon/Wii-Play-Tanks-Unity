@@ -1,6 +1,17 @@
 {
-  "name": "Game.Gameplay",
-  "references": [
-    "Game.Core"
-  ]
+    "name": "Game.Gameplay",
+    "rootNamespace": "",
+    "references": [
+        "Game.Core",
+        "NavMeshPlus"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

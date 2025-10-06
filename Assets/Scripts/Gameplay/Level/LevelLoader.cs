@@ -4,6 +4,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using NavMeshPlus.Components;
 
 namespace Game.Gameplay.Level
 {
@@ -23,30 +24,31 @@ namespace Game.Gameplay.Level
             Clear();
             if (!def || !def.stagePrefab) { Debug.LogWarning("LevelDefinition missing"); return; }
             StageInstance = Instantiate(def.stagePrefab, parent);
-            var spawns = StageInstance.GetComponentsInChildren<SpawnPoint>();
-            foreach (var sp in spawns)
-            {
-                switch (sp.type)
-                {
-                    case SpawnType.Player:
-                        PlayerInstance = Instantiate(playerTankPrefab, sp.transform.position, sp.transform.rotation);
-                        break;
-                    case SpawnType.EnemyStationary:
-                        EnemyInstances.Add(Instantiate(enemyStationaryPrefab, sp.transform.position, sp.transform.rotation));
-                        break;
-                    case SpawnType.EnemyMoving:
-                        EnemyInstances.Add(Instantiate(enemyMovingPrefab, sp.transform.position, sp.transform.rotation));
-                        break;
-                }
-            }
+            StageInstance.GetComponentInChildren<NavMeshSurface>().BuildNavMesh();
+            assignAllTanks(StageInstance);
         }
 
         public void Clear()
         {
             if (StageInstance) Destroy(StageInstance);
             if (PlayerInstance) Destroy(PlayerInstance);
-            foreach (var e in EnemyInstances) if (e) Destroy(e);
+            foreach (var e in EnemyInstances) 
+                if (e) 
+                    Destroy(e);
             EnemyInstances.Clear();
+        }
+
+        private void assignAllTanks(GameObject stageInstance)
+        {
+            Transform tanksParent = stageInstance.transform.Find("Tanks");
+
+            foreach (Transform tank in tanksParent)
+            {
+                if (tank.CompareTag("Enemy"))
+                    EnemyInstances.Add(tank.gameObject);
+                else if (tank.CompareTag("Player"))
+                    PlayerInstance = tank.gameObject;
+            }
         }
     }
 }
