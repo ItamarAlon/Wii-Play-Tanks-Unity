@@ -29,11 +29,18 @@ namespace Game.GameLoop
             SceneManager.LoadScene("Game");
         }
 
-        public void BeginStage(LevelDefinition def)
+        public void BeginStage(LevelDefinition def, bool firstTimeLoading)
         {
             StopAllCoroutines();
-            levelLoader.Load(def, stageRoot);
-            WirePlayerAndEnemies();
+
+            if (firstTimeLoading)               
+            { 
+                levelLoader.Load(def, stageRoot);
+                WirePlayerAndEnemies();
+            }
+            else
+                levelLoader.Reload();
+            
             StartCoroutine(StageRoutine(def));
         }
 

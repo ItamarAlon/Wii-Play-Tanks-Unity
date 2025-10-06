@@ -16,8 +16,15 @@ namespace Game.Gameplay.Tanks.Shared
         {
             if (IsDead) return;
             IsDead = true;
+            gameObject.SetActive(false);
             OnDeath?.Invoke(this);
-            Destroy(gameObject);
+        }
+
+        public void Revive()
+        {
+            if (!IsDead) return;
+            IsDead = false;
+            gameObject.SetActive(true);
         }
     }
 }

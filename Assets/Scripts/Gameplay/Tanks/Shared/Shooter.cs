@@ -5,6 +5,8 @@
 using UnityEngine;
 using Game.Gameplay.Projectiles;
 using UnityEngine.Pool;
+using UnityEngine.VFX;
+using System.Collections.Generic;
 
 namespace Game.Gameplay.Tanks.Shared
 {
@@ -21,6 +23,7 @@ namespace Game.Gameplay.Tanks.Shared
         private int _active;
         private Collider2D _collider;
         private ObjectPool<Bullet> _bulletPool;
+        private List<Bullet> activeBullets = new List<Bullet>();
 
         private void Awake()
         {
@@ -28,6 +31,7 @@ namespace Game.Gameplay.Tanks.Shared
                 createFunc: createBullet, 
                 actionOnGet: activateWhenGettingBulletFromPool,
                 actionOnRelease: b => b.gameObject.SetActive(false),
+                actionOnDestroy: b => Destroy(b.gameObject),
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
@@ -40,6 +44,7 @@ namespace Game.Gameplay.Tanks.Shared
             if (!bulletPrefab || !muzzle) return;
 
             Bullet bullet = _bulletPool.Get();
+            activeBullets.Add(bullet);
 
             bullet.Launch(dir.normalized * muzzleSpeed);
             _active++;
@@ -48,11 +53,24 @@ namespace Game.Gameplay.Tanks.Shared
 
         public void ReleaseBullet(Bullet bullet)
         {
+            if (bullet == null) return;
             if (_active > 0)
             {
                 _active--;
                 _bulletPool.Release(bullet);
+                activeBullets.Remove(bullet);
             }
+        }
+
+        public void ClearBullets()
+        {
+            _bulletPool.Clear();
+            foreach (var bullet in activeBullets)
+            {
+                Destroy(bullet.gameObject);
+            }
+            activeBullets.Clear();
+            _active = 0;
         }
 
         void Update()

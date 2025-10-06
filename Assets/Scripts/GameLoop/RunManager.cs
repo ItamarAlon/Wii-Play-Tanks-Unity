@@ -25,7 +25,7 @@ namespace Game.GameLoop
         {
             currentLives = startingLives;
             totalKills = 0;
-            LoadStage(currentStageIndex);
+            LoadStage(currentStageIndex, true);
             RefreshHUD();
         }
 
@@ -39,7 +39,7 @@ namespace Game.GameLoop
                 SceneManager.LoadScene("Title");
                 return;
             }
-            LoadStage(currentStageIndex);
+            LoadStage(currentStageIndex, false);
             RefreshHUD();
         }
 
@@ -51,14 +51,14 @@ namespace Game.GameLoop
                 SceneManager.LoadScene("Title");
                 return;
             }
-            LoadStage(currentStageIndex);
+            LoadStage(currentStageIndex, true);
             RefreshHUD();
         }
 
-        private void LoadStage(int idx)
+        private void LoadStage(int idx, bool firstTimeLoading)
         {
             var def = StageList[idx];
-            stageManager.BeginStage(def);
+            stageManager.BeginStage(def, firstTimeLoading);
         }
 
         private void RefreshHUD()
