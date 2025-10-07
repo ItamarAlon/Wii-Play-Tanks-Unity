@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4634876464340005560}
   - component: {fileID: 7621185323303055684}
   - component: {fileID: 3743735772750004465}
+  - component: {fileID: 2780418388653277588}
   m_Layer: 7
   m_Name: MovingTank
   m_TagString: Enemy
@@ -120,7 +121,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
   m_Name: 
@@ -164,7 +165,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba24cb0cc12c8434790413d8db1f5322, type: 3}
   m_Name: 
@@ -180,7 +181,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 290090536791198282}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.1
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -192,7 +193,53 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
+--- !u!114 &2780418388653277588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4976de15050574b4bb71f7b88851c3f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 3743735772750004465}
+  internalUnitsToUnity: 1
+  simulationFps: 60
+  word11_Accel: 0.3
+  word12_DecelMul: 0
+  word13_RandomTurnMaxAngle: 30
+  word14_TimerA: 90
+  word15_TimerB: 150
+  word16_AIMineAwareness: 120
+  word17_AIBulletAwareness: 120
+  word18_PlayerMineAwareness: 0
+  word19_PlayerBulletAwareness: 40
+  word20_SurvivalModeFlag: 1
+  word21_Aggressiveness: 0
+  word22_QueueCount: 4
+  word23_MaxSpeed: 0.02
+  word26_TurnSpeedRadPerFrame: 0.08
+  word27_MaxTurnPivotDeg: 10
+  word28_ObstacleAwareness: 30
+  aiBulletMask:
+    serializedVersion: 2
+    m_Bits: 512
+  playerBulletMask:
+    serializedVersion: 2
+    m_Bits: 4352
+  aiMineMask:
+    serializedVersion: 2
+    m_Bits: 0
+  playerMineMask:
+    serializedVersion: 2
+    m_Bits: 0
+  playerTarget: {fileID: 0}
+  bulletStunTimerFrames: 0
+  mineStunTimerFrames: 0
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
