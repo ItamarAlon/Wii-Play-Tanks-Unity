@@ -32,7 +32,7 @@ namespace Game.Gameplay.Tanks.Shared
 
             if (Input.GetKey(fireKey) && shooter && shooter.muzzle)
             {
-                shooter.TryFire(shooter.muzzle.up);
+                shooter.TryFire();
             }
 
             if (Input.GetKeyDown(mineKey) && minePrefab)

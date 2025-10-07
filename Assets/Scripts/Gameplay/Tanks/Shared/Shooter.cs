@@ -51,6 +51,11 @@ namespace Game.Gameplay.Tanks.Shared
             _cooldownTimer = cooldown;
         }
 
+        public void TryFire()
+        {
+            TryFire(muzzle.up);
+        }
+
         public void ReleaseBullet(Bullet bullet)
         {
             if (bullet == null) return;

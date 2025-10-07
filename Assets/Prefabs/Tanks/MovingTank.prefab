@@ -11,12 +11,11 @@ GameObject:
   - component: {fileID: 459607062893442421}
   - component: {fileID: 697450141309976428}
   - component: {fileID: 6156587957796854439}
-  - component: {fileID: 7579512464522570629}
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
-  - component: {fileID: 7621185323303055684}
   - component: {fileID: 3743735772750004465}
   - component: {fileID: 2780418388653277588}
+  - component: {fileID: 7923056913818435197}
   m_Layer: 7
   m_Name: MovingTank
   m_TagString: Enemy
@@ -114,20 +113,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &7579512464522570629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 2
-  accel: 1
 --- !u!114 &2635765008753344097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,20 +143,6 @@ MonoBehaviour:
   cooldown: 0.25
   maxActive: 4
   isPlayer: 0
---- !u!114 &7621185323303055684
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba24cb0cc12c8434790413d8db1f5322, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turret: {fileID: 4478932648053384618}
-  chaseSpeed: 1
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -181,7 +152,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 290090536791198282}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.1
+  m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -193,7 +164,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 0
+  m_ObstacleAvoidanceType: 3
 --- !u!114 &2780418388653277588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +184,7 @@ MonoBehaviour:
   word12_DecelMul: 0
   word13_RandomTurnMaxAngle: 30
   word14_TimerA: 90
-  word15_TimerB: 150
+  word15_TimerB: 200
   word16_AIMineAwareness: 120
   word17_AIBulletAwareness: 120
   word18_PlayerMineAwareness: 0
@@ -240,6 +211,37 @@ MonoBehaviour:
   playerTarget: {fileID: 0}
   bulletStunTimerFrames: 0
   mineStunTimerFrames: 0
+--- !u!114 &7923056913818435197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201a84bfd2379fe4e9010f7feef17784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turretPivot: {fileID: 4478932648053384618}
+  turret: {fileID: 4784823741860575744}
+  target: {fileID: 0}
+  shooter: {fileID: 4634876464340005560}
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  requireLineOfSight: 1
+  shootTimerA: 90
+  shootTimerB: 150
+  turretTurnSpeedRadPerFrame: 1
+  fireAngleToleranceDeg: 3
+  minFireDistance: 0.75
+  maxFireDistance: 30
+  aimRandomMaxDeg: 45
+  enableLeadAim: 1
+  overrideBulletSpeedUPS: 0
+  oneShotPerOpportunity: 1
+  simulationFps: 60
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,7 +251,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4478932648053384618}
-  - component: {fileID: 2077602275181323599}
   m_Layer: 7
   m_Name: TurretPivot
   m_TagString: Untagged
@@ -273,21 +274,6 @@ Transform:
   - {fileID: 4784823741860575744}
   m_Father: {fileID: 459607062893442421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2077602275181323599
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3287747312142812771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7345dfb44239682488e8e1aefb77a04b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldCamera: {fileID: 0}
-  spriteFaces: 1
-  extraDegrees: 0
 --- !u!1 &3381661596431630524
 GameObject:
   m_ObjectHideFlags: 0
