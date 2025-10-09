@@ -159,7 +159,7 @@ NavMeshAgent:
   m_AngularSpeed: 120
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0
@@ -184,13 +184,13 @@ MonoBehaviour:
   word12_DecelMul: 0
   word13_RandomTurnMaxAngle: 30
   word14_TimerA: 90
-  word15_TimerB: 200
+  word15_TimerB: 150
   word16_AIMineAwareness: 120
   word17_AIBulletAwareness: 120
   word18_PlayerMineAwareness: 0
   word19_PlayerBulletAwareness: 40
   word20_SurvivalModeFlag: 1
-  word21_Aggressiveness: 0
+  word21_Aggressiveness: 0.08
   word22_QueueCount: 4
   word23_MaxSpeed: 0.02
   word26_TurnSpeedRadPerFrame: 0.08
