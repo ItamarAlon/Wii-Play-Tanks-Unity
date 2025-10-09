@@ -86,7 +86,7 @@ public class DumbestMovingTankAI : MonoBehaviour
     private bool largeTurnFlag;
     private bool sequenceTurnFlag;
     private bool randomTurnFlag;
-    private bool mineMovementOverrideFlag;
+    private bool mineMovementOverrideFlag = false;
 
     private enum QueueSource { None, RandomTurn, LargeTurn }
     private readonly Queue<(float angleDeg, QueueSource src)> movementQueue = new();
@@ -194,23 +194,20 @@ public class DumbestMovingTankAI : MonoBehaviour
                     lastQueueSource = QueueSource.None;
                 }
             }
+
             largeTurnFlag = false;
             sequenceTurnFlag = true; // consume next queued mini-turn
         }
         else if (randomTurnFlag)
         {
-            float delta = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
+            float randomDelta = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
 
             if (playerTarget != null && word21_Aggressiveness > 0f)
             {
-                Vector2 initialDir = DirFromAngle(getFacingAngleDeg() + delta).normalized;
-                Vector2 toPlayer = ((Vector2)(playerTarget.position - transform.position)).normalized;
-                Vector2 mixed = Vector2.Lerp(initialDir, toPlayer, Mathf.Clamp01(word21_Aggressiveness)).normalized;
-                float mixedDelta = Mathf.DeltaAngle(AngleFromDir(initialDir), AngleFromDir(mixed));
-                delta += mixedDelta;
+                makeRandomDegreeMoreBiasTowardsPlayerPosition(ref randomDelta);
             }
 
-            EnqueueMiniTurnsRelative(delta, QueueSource.RandomTurn);
+            EnqueueMiniTurnsRelative(randomDelta, QueueSource.RandomTurn);
             randomTurnFlag = false;
             sequenceTurnFlag = true;
         }
@@ -223,8 +220,20 @@ public class DumbestMovingTankAI : MonoBehaviour
                 lastQueueSource = entry.src;
                 turnTargetAngleDeg = convertToDegree(entry.angleDeg);
             }
+            else
+                lastQueueSource = QueueSource.None;
             sequenceTurnFlag = false;
         }
+        printLog("movementQueue count: " + movementQueue.Count);
+    }
+
+    private void makeRandomDegreeMoreBiasTowardsPlayerPosition(ref float randomDelta)
+    {
+        Vector2 initialDir = DirFromAngle(getFacingAngleDeg() + randomDelta).normalized;
+        Vector2 toPlayer = ((Vector2)(playerTarget.position - transform.position)).normalized;
+        Vector2 mixed = Vector2.Lerp(initialDir, toPlayer, Mathf.Clamp01(word21_Aggressiveness)).normalized;
+        float mixedDelta = Mathf.DeltaAngle(getAngleFromDir(initialDir), getAngleFromDir(mixed));
+        randomDelta += mixedDelta;
     }
 
     // ───────────────────────── step 3: rotate body ─────────────────────────
@@ -282,7 +291,7 @@ public class DumbestMovingTankAI : MonoBehaviour
 
         agent.speed = unitsPerSecond;
 
-        Vector3 shortAhead = transform.position + (Vector3)(dir2D * 2f);
+        Vector3 shortAhead = transform.position + (Vector3)(dir2D);
         agent.SetDestination(shortAhead);
     }
 
@@ -434,7 +443,7 @@ public class DumbestMovingTankAI : MonoBehaviour
         return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
     }
 
-    private float arctanDeg(float y, float x)
+    private static float arctanDeg(float y, float x)
     {
         return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
     }
@@ -447,9 +456,19 @@ public class DumbestMovingTankAI : MonoBehaviour
         return Mathf.Repeat(num, 360f);
     }
 
-    private static float AngleFromDir(Vector2 dir) => Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+    private static float getAngleFromDir(Vector2 dir) => arctanDeg(dir.y, dir.x);
 
     private static float SignedAngleDeg(float fromDeg, float toDeg) => Mathf.DeltaAngle(fromDeg, toDeg);
+
+    private int frameCount = 0;
+    private void printLog(string message)
+    {
+        if (frameCount == 0)
+            Debug.Log(message);
+        else if (frameCount == 60)
+            frameCount = -1;
+        frameCount++;
+    }
 
     // Public hooks (unchanged)
     public void NotifyMineMovementOverride() => mineMovementOverrideFlag = true;

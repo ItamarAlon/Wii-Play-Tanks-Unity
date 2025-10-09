@@ -191,7 +191,7 @@ MonoBehaviour:
   word19_PlayerBulletAwareness: 40
   word20_SurvivalModeFlag: 1
   word21_Aggressiveness: 0.08
-  word22_QueueCount: 4
+  word22_QueueCount: 7
   word23_MaxSpeed: 0.02
   word26_TurnSpeedRadPerFrame: 0.08
   word27_MaxTurnPivotDeg: 10
