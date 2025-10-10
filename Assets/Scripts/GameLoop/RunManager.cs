@@ -27,6 +27,9 @@ namespace Game.GameLoop
             totalKills = 0;
             LoadStage(currentStageIndex, true);
             RefreshHUD();
+
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("PlayerBullet"), LayerMask.NameToLayer("Holes"));
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("EnemyBullet"), LayerMask.NameToLayer("Holes"));
         }
 
         public void AddKill() { totalKills++; RefreshHUD(); }

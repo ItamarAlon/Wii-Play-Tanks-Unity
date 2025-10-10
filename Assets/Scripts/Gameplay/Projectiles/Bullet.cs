@@ -4,6 +4,7 @@
 
 using UnityEngine;
 using Game.Gameplay.Tanks.Shared;
+using UnityEngine.Tilemaps;
 
 namespace Game.Gameplay.Projectiles
 {
@@ -23,7 +24,7 @@ namespace Game.Gameplay.Projectiles
         void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
-            _life = lifeSeconds;
+            _life = lifeSeconds;           
         }
 
         public void SetOwner(Shooter s) => _owner = s;
@@ -42,7 +43,13 @@ namespace Game.Gameplay.Projectiles
         }
 
         void OnCollisionEnter2D(Collision2D col)
-        {          
+        {
+            //if (col.gameObject.CompareTag("Hole"))
+            //{
+            //    Physics2D.IgnoreCollision(gameObject.GetComponent<Collider2D>(), col.collider);
+            //    return;
+            //}
+
             string ln = LayerMask.LayerToName(col.collider.gameObject.layer);
             // Hit a tank or a mine ? kill & despawn
             if (ln == "Player" || ln == "Enemy" || ln == "Mines")
