@@ -170,9 +170,9 @@ public class TankTurretShooterAI : MonoBehaviour
 
     bool hasLineOfSight(Vector2 from, Vector2 to)
     {
-        Vector2 d = to - from;
-        var hit = Physics2D.Raycast(from, d.normalized, d.magnitude, lineOfSightMask);
-        return hit.collider == null;
+        Vector2 delta = to - from;
+        var hit = Physics2D.Raycast(from, delta.normalized, delta.magnitude, lineOfSightMask);
+        return hit.collider == null || hit.collider.CompareTag("Hole");
     }
 
     float getBulletSpeedUPS()
