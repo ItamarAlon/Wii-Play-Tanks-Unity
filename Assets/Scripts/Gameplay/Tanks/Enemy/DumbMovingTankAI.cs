@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Assets.Scripts.Core;
 
 /// <summary>
 /// Wii Play Tanks - Dumbest Moving Tank (Movement-Only AI) – refactor only (behavior unchanged)
@@ -218,7 +219,7 @@ public class DumbestMovingTankAI : MonoBehaviour
             {
                 var entry = movementQueue.Dequeue();
                 lastQueueSource = entry.src;
-                turnTargetAngleDeg = convertToDegree(entry.angleDeg);
+                turnTargetAngleDeg = GeneralFunc.ConvertToDegree(entry.angleDeg);
             }
             else
                 lastQueueSource = QueueSource.None;
@@ -229,7 +230,7 @@ public class DumbestMovingTankAI : MonoBehaviour
 
     private void makeRandomDegreeMoreBiasTowardsPlayerPosition(ref float randomDelta)
     {
-        Vector2 initialDir = DirFromAngle(getFacingAngleDeg() + randomDelta).normalized;
+        Vector2 initialDir = GeneralFunc.DirFromAngle(getFacingAngleDeg() + randomDelta).normalized;
         Vector2 toPlayer = ((Vector2)(playerTarget.position - transform.position)).normalized;
         Vector2 mixed = Vector2.Lerp(initialDir, toPlayer, Mathf.Clamp01(word21_Aggressiveness)).normalized;
         float mixedDelta = Mathf.DeltaAngle(getAngleFromDir(initialDir), getAngleFromDir(mixed));
@@ -404,7 +405,7 @@ public class DumbestMovingTankAI : MonoBehaviour
     private void EnqueueMiniTurnsRelative(float deltaAngleDeg, QueueSource src)
     {
         float start = getFacingAngleDeg();
-        float target = convertToDegree(start + deltaAngleDeg);
+        float target = GeneralFunc.ConvertToDegree(start + deltaAngleDeg);
 
         movementQueue.Clear();
         lastQueueSource = src;
@@ -415,7 +416,7 @@ public class DumbestMovingTankAI : MonoBehaviour
         float accum = start;
         for (int i = 1; i <= count; i++)
         {
-            accum = convertToDegree(start + step * i);
+            accum = GeneralFunc.ConvertToDegree(start + step * i);
             movementQueue.Enqueue((accum, src));
         }
     }
@@ -427,7 +428,7 @@ public class DumbestMovingTankAI : MonoBehaviour
 
     private float getOppositeFacingAngleDeg()
     {
-        return convertToDegree(getFacingAngleDeg() + 180f);
+        return GeneralFunc.ConvertToDegree(getFacingAngleDeg() + 180f);
     }
 
     private void SetFacingAngleDeg(float angle)
@@ -437,23 +438,9 @@ public class DumbestMovingTankAI : MonoBehaviour
         transform.up = dir.normalized;
     }
 
-    private static Vector2 DirFromAngle(float angleDeg)
-    {
-        float rad = angleDeg * Mathf.Deg2Rad;
-        return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
-    }
-
     private static float arctanDeg(float y, float x)
     {
         return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
-    }
-
-    /// <summary>
-    /// converts a number to a degree: between 0 and 360
-    /// </summary>
-    private float convertToDegree(float num)
-    {
-        return Mathf.Repeat(num, 360f);
     }
 
     private static float getAngleFromDir(Vector2 dir) => arctanDeg(dir.y, dir.x);

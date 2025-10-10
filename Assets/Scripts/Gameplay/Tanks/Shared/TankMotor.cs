@@ -14,7 +14,10 @@ namespace Game.Gameplay.Tanks.Shared
         private Rigidbody2D _rb;
         private Vector2 _desiredVel;
 
-        void Awake() { _rb = GetComponent<Rigidbody2D>(); }
+        void Awake() 
+        { 
+            _rb = GetComponent<Rigidbody2D>(); 
+        }
         public void SetDesiredVelocity(Vector2 v) => _desiredVel = v * moveSpeed;
 
         void FixedUpdate()

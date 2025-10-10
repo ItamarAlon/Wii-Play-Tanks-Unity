@@ -1,5 +1,6 @@
 using UnityEngine;
-using Game.Gameplay.Tanks.Shared; // Shooter
+using Game.Gameplay.Tanks.Shared;
+using Assets.Scripts.Core;
 
 /// <summary>
 /// TankTurretShooterAI (refactor: same behavior, smaller methods)
@@ -21,7 +22,7 @@ public class TankTurretShooterAI : MonoBehaviour
     [SerializeField] int shootTimerB = 150;
 
     [Header("Turret Rotation & Fire Gate")]
-    [SerializeField] float turretTurnSpeedRadPerFrame = 0.08f; // radians per frame
+    [SerializeField] float turretTurnSpeedRadPerFrame = 0.08f;
     [SerializeField] float fireAngleToleranceDeg = 3f;
 
     [Header("Distance Gates (Unity units)")]
@@ -58,7 +59,21 @@ public class TankTurretShooterAI : MonoBehaviour
     void Update()
     {
         HandleShootingOpportunityCadenceAndScheduling();
-        RotateTurretTowardDesired();
+        if (target)
+        {
+            RotateTurretTowardDesired();
+        }
+        else
+        {
+            // Reuse your configured turn speed for a smooth constant spin
+            float degPerFrame = turretTurnSpeedRadPerFrame;
+            float step = degPerFrame * simulationFps * Time.deltaTime;
+
+            // Advance the desired angle and set it on the pivot (same setter you already use)
+            desiredTurretAngleDeg = normalizeDeg(desiredTurretAngleDeg + step);
+            setPivotAngleDeg(desiredTurretAngleDeg);
+        }
+
         FireIfAligned();
     }
 
@@ -102,7 +117,7 @@ public class TankTurretShooterAI : MonoBehaviour
 
     void RotateTurretTowardDesired()
     {
-        float degPerFrame = turretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
+        float degPerFrame = turretTurnSpeedRadPerFrame;
         float step = degPerFrame * simulationFps * Time.deltaTime;
 
         float currentDeg = getAngleDeg(turretPivot.up);
