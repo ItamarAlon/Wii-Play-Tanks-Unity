@@ -16,13 +16,15 @@ namespace Game.GameLoop
         public int totalKills { get; private set; }
         public int currentStageIndex { get; private set; } = 0;
 
-        public LevelDefinition[] StageList;
+        public GameObject[] StageList;
         public LevelLoader levelLoader;
         public HUDController hud;
         public StageManager stageManager;
 
         void Start()
         {
+            deactivateAllStages();
+
             currentLives = startingLives;
             totalKills = 0;
             LoadStage(currentStageIndex, true);
@@ -30,6 +32,14 @@ namespace Game.GameLoop
 
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("PlayerBullet"), LayerMask.NameToLayer("Holes"));
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("EnemyBullet"), LayerMask.NameToLayer("Holes"));
+        }
+
+        private void deactivateAllStages()
+        {
+            foreach (var stage in StageList)
+            {
+                stage.SetActive(false);
+            }
         }
 
         public void AddKill() 
@@ -52,6 +62,7 @@ namespace Game.GameLoop
 
         public void OnStageCleared()
         {
+            StageList[currentStageIndex].SetActive(false);
             currentStageIndex++;
             if (currentStageIndex >= StageList.Length)
             {
@@ -62,10 +73,11 @@ namespace Game.GameLoop
             RefreshHUD();
         }
 
-        private GameObject LoadStage(int idx, bool firstTimeLoading)
+        private void LoadStage(int idx, bool firstTimeLoading)
         {
-            var def = StageList[idx];
-            return stageManager.BeginStage(def, firstTimeLoading);
+            var currentStage = StageList[idx];
+            currentStage.SetActive(true);
+            stageManager.BeginStage(currentStage, firstTimeLoading);
         }
 
         private void RefreshHUD()

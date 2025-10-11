@@ -29,27 +29,24 @@ namespace Game.GameLoop
             SceneManager.LoadScene("Game");
         }
 
-        public GameObject BeginStage(LevelDefinition def, bool firstTimeLoading)
+        public void BeginStage(GameObject def, bool firstTimeLoading)
         {
-            StopAllCoroutines();
-            GameObject stageInstance;
-
+            //StopAllCoroutines();
             if (firstTimeLoading)               
             {
-                stageInstance = levelLoader.Load(def);
-                WirePlayerAndEnemies();
+                levelLoader.Load(def);
+                wirePlayerAndEnemies();
             }
             else
             {
-                stageInstance = levelLoader.Reload();
+                levelLoader.Reload();
                 _aliveEnemies = _enemiesInCurrentStage;
             }
             
-            StartCoroutine(StageRoutine(def));
-            return stageInstance;
+            //StartCoroutine(StageRoutine(def));
         }
 
-        private void WirePlayerAndEnemies()
+        private void wirePlayerAndEnemies()
         {
             var playerH = levelLoader.PlayerInstance.GetComponent<Health>();
             playerH.OnDeath += _ => run.OnPlayerDied();
