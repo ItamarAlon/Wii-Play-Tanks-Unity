@@ -2,7 +2,8 @@
     "name": "Game.UI",
     "rootNamespace": "",
     "references": [
-        "Game.Core"
+        "Game.Core",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

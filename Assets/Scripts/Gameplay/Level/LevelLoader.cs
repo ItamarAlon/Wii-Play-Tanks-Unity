@@ -15,12 +15,6 @@ namespace Game.Gameplay.Level
 {
     public class LevelLoader : MonoBehaviour
     {
-        [Header("Prefabs")]
-        public Transform stageRoot;
-        public GameObject playerTankPrefab;
-        public GameObject enemyStationaryPrefab;
-        public GameObject enemyMovingPrefab;
-
         [HideInInspector] public GameObject StageInstance;
         [HideInInspector] public GameObject PlayerInstance;
         [HideInInspector] public List<GameObject> EnemyInstances;

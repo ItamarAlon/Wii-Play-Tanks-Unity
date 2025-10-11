@@ -4,17 +4,18 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Game.UI
 {
     public class HUDController : MonoBehaviour
     {
-        public Text livesText;
-        public Text stageText;
-        public Text killsText;
+        public TMP_Text livesText;
+        public TMP_Text stageText;
+        public TMP_Text killsText;
 
-        public void SetLives(int v) { if (livesText) livesText.text = $"Lives: {v}"; }
-        public void SetStage(int v) { if (stageText) stageText.text = $"Stage: {v}"; }
-        public void SetKills(int v) { if (killsText) killsText.text = $"Kills: {v}"; }
+        public void SetLives(int livesNum) { if (livesText) livesText.text = livesNum.ToString(); }
+        public void SetStage(int stageNum) { if (stageText) stageText.text = $"Stage {stageNum}"; }
+        public void SetKills(int killsNum) { if (killsText) killsText.text = killsNum.ToString(); }
     }
 }
