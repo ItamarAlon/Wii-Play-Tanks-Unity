@@ -53,7 +53,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5766185504006048129
 Transform:
   m_ObjectHideFlags: 0
@@ -4152,7 +4152,6 @@ GameObject:
   - component: {fileID: 6874712911329567538}
   - component: {fileID: 4026370557110927829}
   - component: {fileID: 441387781072302748}
-  - component: {fileID: 4800606183363421840}
   m_Layer: 13
   m_Name: Holes
   m_TagString: Hole
@@ -5741,20 +5740,6 @@ MonoBehaviour:
   m_Area: 1
   m_IgnoreFromBuild: 0
   m_AffectedAgents: ffffffff
---- !u!114 &4800606183363421840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9023024928346618659}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 088924c48556c634fb1bb4ca6e5d795c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  componentsToIgnoreCollisionWith:
-  - {fileID: 4338627100847286774, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
 --- !u!1001 &3425674338578281812
 PrefabInstance:
   m_ObjectHideFlags: 0

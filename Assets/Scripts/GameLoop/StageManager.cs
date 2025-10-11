@@ -15,7 +15,6 @@ namespace Game.GameLoop
 {
     public class StageManager : MonoBehaviour
     {
-        //public Transform stageRoot;
         public LevelLoader levelLoader;
         public RunManager run;
         public StageBanner banner;

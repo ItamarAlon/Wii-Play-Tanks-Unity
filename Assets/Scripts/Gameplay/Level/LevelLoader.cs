@@ -8,16 +8,19 @@ using NavMeshPlus.Components;
 using System;
 using Game.Gameplay.Tanks.Shared;
 using System.Linq;
+using UnityEngine.Tilemaps;
 
 namespace Game.Gameplay.Level
 {
     public class LevelLoader : MonoBehaviour
     {
+        private const string k_NavMeshObjName = "NavMesh";
+
         [Header("Prefabs")]
+        public Transform stageRoot;
         public GameObject playerTankPrefab;
         public GameObject enemyStationaryPrefab;
         public GameObject enemyMovingPrefab;
-        public Transform stageRoot;
 
         [HideInInspector] public GameObject StageInstance;
         [HideInInspector] public GameObject PlayerInstance;
@@ -25,16 +28,45 @@ namespace Game.Gameplay.Level
 
         private Vector2 initialPlayerPosition;
         private List<(GameObject, Vector2)> EnemyInstancesAndInitialPos = new List<(GameObject, Vector2)>();
+        private bool isNavMeshBuilt = false;
+        private Transform navMesh;
+        private NavMeshSurface navMeshSurface;
+
+        void Awake()
+        {
+            navMesh = stageRoot.Find(k_NavMeshObjName);
+            navMeshSurface = navMesh.gameObject.GetComponent<NavMeshSurface>();
+        }
 
         public GameObject Load(LevelDefinition def)
         {
             Clear();
             if (!def || !def.stagePrefab) { Debug.LogWarning("LevelDefinition missing"); return null; }
             StageInstance = Instantiate(def.stagePrefab, stageRoot);
-            StageInstance.GetComponentInChildren<NavMeshSurface>().BuildNavMesh();
+            if (!StageInstance.GetComponentInChildren<Tilemap>().layoutGrid) return null;
+            setUpNavMeshSurface();
+
+            //StageInstance.GetComponentInChildren<NavMeshSurface>().BuildNavMesh();
             assignAllTanks(StageInstance);
 
             return StageInstance;
+        }
+
+        private void setUpNavMeshSurface()
+        {
+            if (!StageInstance) return;
+            navMesh.SetParent(StageInstance.transform);
+
+            navMeshSurface.navMeshData = null;
+            navMeshSurface.BuildNavMesh();
+
+            //if (!isNavMeshBuilt)
+            //{
+            //    navMeshSurface.BuildNavMesh();
+            //    isNavMeshBuilt = true;
+            //}
+            //else
+            //    navMeshSurface.UpdateNavMesh(navMeshSurface.navMeshData);
         }
 
         public GameObject Reload()
