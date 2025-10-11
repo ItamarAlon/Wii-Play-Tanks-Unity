@@ -23,6 +23,7 @@ namespace Game.GameLoop
 
         private bool _inPreview;
         private int _aliveEnemies;
+        private int _enemiesInCurrentStage;
 
         public void LoadGame()
         {
@@ -39,7 +40,10 @@ namespace Game.GameLoop
                 WirePlayerAndEnemies();
             }
             else
+            {
                 levelLoader.Reload();
+                _aliveEnemies = _enemiesInCurrentStage;
+            }
             
             StartCoroutine(StageRoutine(def));
         }
@@ -59,6 +63,7 @@ namespace Game.GameLoop
                     h.OnDeath += OnEnemyDeath;
                 }
             }
+            _enemiesInCurrentStage = _aliveEnemies;
         }
 
         private void OnEnemyDeath(Health h)

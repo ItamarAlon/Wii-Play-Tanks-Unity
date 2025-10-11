@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8cd6737d51344974894f944709bb76d4, type: 3}
-  m_Name: Stage_2
+  m_Name: Stage_5
   m_EditorClassIdentifier: 
-  stageNumber: 2
-  stagePrefab: {fileID: 6145961104276490963, guid: c55ed81ece45df1429a41c8edadd4269, type: 3}
+  stageNumber: 5
+  stagePrefab: {fileID: 6145961104276490963, guid: 5caae72cc3ef2e846ab3964fcb491dc8, type: 3}
   previewSeconds: 0
   defaultBulletBounces: 2

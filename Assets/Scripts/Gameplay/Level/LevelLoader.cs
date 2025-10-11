@@ -50,8 +50,10 @@ namespace Game.Gameplay.Level
 
         public void Clear()
         {
-            if (StageInstance) Destroy(StageInstance);
-            if (PlayerInstance) Destroy(PlayerInstance);
+            if (StageInstance)
+                Destroy(StageInstance);
+            if (PlayerInstance)
+                Destroy(PlayerInstance);
             foreach (var e in EnemyInstances) 
                 if (e) 
                     Destroy(e);

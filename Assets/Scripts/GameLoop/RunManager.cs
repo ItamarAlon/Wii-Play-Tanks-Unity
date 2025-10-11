@@ -32,7 +32,11 @@ namespace Game.GameLoop
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("EnemyBullet"), LayerMask.NameToLayer("Holes"));
         }
 
-        public void AddKill() { totalKills++; RefreshHUD(); }
+        public void AddKill() 
+        { 
+            totalKills++; 
+            RefreshHUD(); 
+        }
 
         public void OnPlayerDied()
         {

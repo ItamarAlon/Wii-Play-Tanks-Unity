@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cd6737d51344974894f944709bb76d4, type: 3}
   m_Name: Stage_4
   m_EditorClassIdentifier: 
-  stageNumber: 1
+  stageNumber: 4
   stagePrefab: {fileID: 6145961104276490963, guid: 189cd4ec79a663d48ab844b43d53095a, type: 3}
   previewSeconds: 0
   defaultBulletBounces: 2

@@ -11,13 +11,14 @@ GameObject:
   - component: {fileID: 459607062893442421}
   - component: {fileID: 697450141309976428}
   - component: {fileID: 6156587957796854439}
-  - component: {fileID: 7579512464522570629}
-  - component: {fileID: 8163819590028883333}
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
-  m_Layer: 6
-  m_Name: PlayerTank
-  m_TagString: Player
+  - component: {fileID: 3743735772750004465}
+  - component: {fileID: 2780418388653277588}
+  - component: {fileID: 7923056913818435197}
+  m_Layer: 7
+  m_Name: AshTank
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -112,37 +113,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &7579512464522570629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 1.8
-  accel: 10
---- !u!114 &8163819590028883333
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23617346016445644a1d83b9b38364cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shooter: {fileID: 4634876464340005560}
-  turret: {fileID: 4784823741860575744}
-  minePrefab: {fileID: 5545409872264800293, guid: 08c7a007e6b34e64296f1b296a1e270e, type: 3}
-  fireKey: 323
-  mineKey: 101
 --- !u!114 &2635765008753344097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,8 +142,106 @@ MonoBehaviour:
   muzzleSpeed: 3.4
   cooldown: 0.25
   maxActive: 4
-  isPlayer: 1
-  maxBounces: -1
+  isPlayer: 0
+--- !u!195 &3743735772750004465
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 0
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 3
+--- !u!114 &2780418388653277588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4976de15050574b4bb71f7b88851c3f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 3743735772750004465}
+  internalUnitsToUnity: 1
+  simulationFps: 60
+  word11_Accel: 0.3
+  word12_DecelMul: 0
+  word13_RandomTurnMaxAngle: 90
+  word14_TimerA: 90
+  word15_TimerB: 150
+  word16_AIMineAwareness: 120
+  word17_AIBulletAwareness: 120
+  word18_PlayerMineAwareness: 0
+  word19_PlayerBulletAwareness: 40
+  word20_SurvivalModeFlag: 1
+  word21_Aggressiveness: 0.08
+  word22_QueueCount: 7
+  word23_MaxSpeed: 0.02
+  word26_TurnSpeedRadPerFrame: 0.08
+  word27_MaxTurnPivotDeg: 10
+  word28_ObstacleAwareness: 30
+  aiBulletMask:
+    serializedVersion: 2
+    m_Bits: 512
+  playerBulletMask:
+    serializedVersion: 2
+    m_Bits: 4352
+  aiMineMask:
+    serializedVersion: 2
+    m_Bits: 0
+  playerMineMask:
+    serializedVersion: 2
+    m_Bits: 0
+  playerTarget: {fileID: 0}
+  bulletStunTimerFrames: 0
+  mineStunTimerFrames: 0
+--- !u!114 &7923056913818435197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201a84bfd2379fe4e9010f7feef17784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turretPivot: {fileID: 4478932648053384618}
+  turret: {fileID: 4784823741860575744}
+  target: {fileID: 0}
+  shooter: {fileID: 4634876464340005560}
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  requireLineOfSight: 1
+  shootTimerA: 90
+  shootTimerB: 150
+  turretTurnSpeedRadPerFrame: 1
+  fireAngleToleranceDeg: 3
+  minFireDistance: 0.75
+  maxFireDistance: 30
+  aimRandomMaxDeg: 45
+  enableLeadAim: 1
+  overrideBulletSpeedUPS: 0
+  oneShotPerOpportunity: 1
+  simulationFps: 60
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,8 +251,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4478932648053384618}
-  - component: {fileID: 2077602275181323599}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: TurretPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,21 +274,6 @@ Transform:
   - {fileID: 4784823741860575744}
   m_Father: {fileID: 459607062893442421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2077602275181323599
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3287747312142812771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7345dfb44239682488e8e1aefb77a04b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldCamera: {fileID: 0}
-  spriteFaces: 1
-  extraDegrees: 0
 --- !u!1 &3381661596431630524
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,7 +284,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4784823741860575744}
   - component: {fileID: 6837061026906920055}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -319,7 +371,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4699912395469050728}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -351,7 +403,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4542270977892972629}
   - component: {fileID: 2797000229245333766}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Hull
   m_TagString: Untagged
   m_Icon: {fileID: 0}

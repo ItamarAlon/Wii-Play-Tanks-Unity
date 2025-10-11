@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 2780418388653277588}
   - component: {fileID: 7923056913818435197}
   m_Layer: 7
-  m_Name: MovingTank
+  m_Name: MarineTank
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,10 +139,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   muzzle: {fileID: 4699912395469050728}
   bulletPrefab: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
-  muzzleSpeed: 3.4
+  muzzleSpeed: 7.6
   cooldown: 0.25
-  maxActive: 4
+  maxActive: 1
   isPlayer: 0
+  maxBounces: 0
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -182,18 +183,18 @@ MonoBehaviour:
   simulationFps: 60
   word11_Accel: 0.3
   word12_DecelMul: 0
-  word13_RandomTurnMaxAngle: 90
-  word14_TimerA: 90
-  word15_TimerB: 150
+  word13_RandomTurnMaxAngle: 30
+  word14_TimerA: 10
+  word15_TimerB: 5
   word16_AIMineAwareness: 120
   word17_AIBulletAwareness: 120
   word18_PlayerMineAwareness: 0
   word19_PlayerBulletAwareness: 40
   word20_SurvivalModeFlag: 1
-  word21_Aggressiveness: 0.08
-  word22_QueueCount: 7
-  word23_MaxSpeed: 0.02
-  word26_TurnSpeedRadPerFrame: 0.08
+  word21_Aggressiveness: 0
+  word22_QueueCount: 4
+  word23_MaxSpeed: 0.019
+  word26_TurnSpeedRadPerFrame: 0.18
   word27_MaxTurnPivotDeg: 10
   word28_ObstacleAwareness: 30
   aiBulletMask:
@@ -231,8 +232,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   requireLineOfSight: 1
-  shootTimerA: 90
-  shootTimerB: 150
+  shootTimerA: 10
+  shootTimerB: 5
   turretTurnSpeedRadPerFrame: 1
   fireAngleToleranceDeg: 3
   minFireDistance: 0.75
