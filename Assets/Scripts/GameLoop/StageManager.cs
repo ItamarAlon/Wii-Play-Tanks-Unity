@@ -15,7 +15,7 @@ namespace Game.GameLoop
 {
     public class StageManager : MonoBehaviour
     {
-        public Transform stageRoot;
+        //public Transform stageRoot;
         public LevelLoader levelLoader;
         public RunManager run;
         public StageBanner banner;
@@ -30,22 +30,24 @@ namespace Game.GameLoop
             SceneManager.LoadScene("Game");
         }
 
-        public void BeginStage(LevelDefinition def, bool firstTimeLoading)
+        public GameObject BeginStage(LevelDefinition def, bool firstTimeLoading)
         {
             StopAllCoroutines();
+            GameObject stageInstance;
 
             if (firstTimeLoading)               
-            { 
-                levelLoader.Load(def, stageRoot);
+            {
+                stageInstance = levelLoader.Load(def);
                 WirePlayerAndEnemies();
             }
             else
             {
-                levelLoader.Reload();
+                stageInstance = levelLoader.Reload();
                 _aliveEnemies = _enemiesInCurrentStage;
             }
             
             StartCoroutine(StageRoutine(def));
+            return stageInstance;
         }
 
         private void WirePlayerAndEnemies()

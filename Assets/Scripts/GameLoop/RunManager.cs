@@ -62,10 +62,10 @@ namespace Game.GameLoop
             RefreshHUD();
         }
 
-        private void LoadStage(int idx, bool firstTimeLoading)
+        private GameObject LoadStage(int idx, bool firstTimeLoading)
         {
             var def = StageList[idx];
-            stageManager.BeginStage(def, firstTimeLoading);
+            return stageManager.BeginStage(def, firstTimeLoading);
         }
 
         private void RefreshHUD()

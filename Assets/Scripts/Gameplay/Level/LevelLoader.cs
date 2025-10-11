@@ -17,6 +17,7 @@ namespace Game.Gameplay.Level
         public GameObject playerTankPrefab;
         public GameObject enemyStationaryPrefab;
         public GameObject enemyMovingPrefab;
+        public Transform stageRoot;
 
         [HideInInspector] public GameObject StageInstance;
         [HideInInspector] public GameObject PlayerInstance;
@@ -25,16 +26,18 @@ namespace Game.Gameplay.Level
         private Vector2 initialPlayerPosition;
         private List<(GameObject, Vector2)> EnemyInstancesAndInitialPos = new List<(GameObject, Vector2)>();
 
-        public void Load(LevelDefinition def, Transform parent)
+        public GameObject Load(LevelDefinition def)
         {
             Clear();
-            if (!def || !def.stagePrefab) { Debug.LogWarning("LevelDefinition missing"); return; }
-            StageInstance = Instantiate(def.stagePrefab, parent);
+            if (!def || !def.stagePrefab) { Debug.LogWarning("LevelDefinition missing"); return null; }
+            StageInstance = Instantiate(def.stagePrefab, stageRoot);
             StageInstance.GetComponentInChildren<NavMeshSurface>().BuildNavMesh();
             assignAllTanks(StageInstance);
+
+            return StageInstance;
         }
 
-        public void Reload()
+        public GameObject Reload()
         {
             PlayerInstance.transform.position = initialPlayerPosition;
             PlayerInstance.GetComponent<Health>().Revive();
@@ -46,6 +49,8 @@ namespace Game.Gameplay.Level
                 e.Item1.GetComponent<Health>().Revive();
                 e.Item1.GetComponent<Shooter>().ClearBullets();
             }
+
+            return StageInstance;
         }
 
         public void Clear()
