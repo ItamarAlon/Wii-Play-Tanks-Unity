@@ -26,6 +26,7 @@ namespace Game.GameLoop
         public LevelLoader levelLoader;
         public HUDController hud;
         public StageManager stageManager;
+        public StageBanner banner;
 
         void Start()
         {
@@ -102,15 +103,16 @@ namespace Game.GameLoop
         {
             stageManager.SetGameplayEnabled(false);
             inStagePreview = true;
-            float t = previewTimeSeconds;
-            while (t > 0f)
+            float time = previewTimeSeconds;
+            while (time > 0f)
             {
-                if (stageManager.banner)
-                    stageManager.banner.Show(CurrentStageNum, t);
-                t -= Time.unscaledDeltaTime;
+                if (banner)
+                    banner.Show(CurrentStageNum, time);
+                time -= Time.unscaledDeltaTime;
                 yield return null;
             }
-            if (stageManager.banner) stageManager.banner.Hide();
+            if (banner) 
+                banner.Hide();
             inStagePreview = false;
             stageManager.SetGameplayEnabled(true);
         }

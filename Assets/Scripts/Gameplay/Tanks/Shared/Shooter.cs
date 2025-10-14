@@ -18,7 +18,7 @@ namespace Game.Gameplay.Tanks.Shared
         public float cooldown = 0.25f;
         public int maxActive = 4;
         public bool isPlayer;
-        public int maxBounces = -1;
+        public int maxBounces = 2;
 
         private float _cooldownTimer;
         private int _active;
@@ -36,9 +36,7 @@ namespace Game.Gameplay.Tanks.Shared
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
-
-            if (maxBounces >= 0)
-                bulletPrefab.maxBounces = maxBounces;
+            bulletPrefab.MaxBounces = maxBounces;
         }
 
         public void TryFire(Vector2 dir)

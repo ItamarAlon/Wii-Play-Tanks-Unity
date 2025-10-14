@@ -143,7 +143,7 @@ MonoBehaviour:
   cooldown: 0.25
   maxActive: 4
   isPlayer: 0
-  maxBounces: -1
+  maxBounces: 2
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0

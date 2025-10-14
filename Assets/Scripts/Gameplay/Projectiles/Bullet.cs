@@ -12,19 +12,16 @@ namespace Game.Gameplay.Projectiles
     [RequireComponent(typeof(Collider2D))]
     public class Bullet : MonoBehaviour
     {
-        public int maxBounces = 2;
-        public float lifeSeconds = 10f;
+        public int MaxBounces { get; set; } = 2;
 
         private Rigidbody2D _rb;
         private int _bounces;
         private Shooter _owner;
-        private float _life;
         private enum TankType { Player, Enemy};
 
         void Awake()
         {
-            _rb = GetComponent<Rigidbody2D>();
-            _life = lifeSeconds;         
+            _rb = GetComponent<Rigidbody2D>();        
         }
 
         public void SetOwner(Shooter s) => _owner = s;
@@ -33,13 +30,6 @@ namespace Game.Gameplay.Projectiles
         {
             _rb.linearVelocity = velocity;
             _bounces = 0;
-            _life = lifeSeconds;
-        }
-
-        void Update()
-        {
-            _life -= Time.deltaTime;
-            if (_life <= 0f) Despawn();
         }
 
         void OnCollisionEnter2D(Collision2D col)
@@ -59,7 +49,7 @@ namespace Game.Gameplay.Projectiles
             if (ln == "Walls")
             {
                 _bounces++;
-                if (_bounces >= maxBounces)
+                if (_bounces >= MaxBounces)
                     Despawn();
                 return;
             }

@@ -141,6 +141,7 @@ MonoBehaviour:
   cooldown: 0.25
   maxActive: 4
   isPlayer: 0
+  maxBounces: 2
 --- !u!114 &7923056913818435197
 MonoBehaviour:
   m_ObjectHideFlags: 0

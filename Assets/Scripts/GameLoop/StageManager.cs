@@ -20,7 +20,6 @@ namespace Game.GameLoop
     {
         public LevelLoader levelLoader;
         public RunManager run;
-        public StageBanner banner;
         public DecalSpawner decals;
 
         private int aliveEnemiesCount;
