@@ -2,12 +2,13 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Assets.Scripts.Core;
+using Assets.Scripts.Gameplay.Tanks.Enemy;
 
 /// <summary>
 /// Wii Play Tanks - Dumbest Moving Tank (Movement-Only AI) – refactor only (behavior unchanged)
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
-public class DumbestMovingTankAI : MonoBehaviour
+public class DumbestMovingTankAI : EnemyAI
 {
     [Header("NavMesh / 2D Setup")]
     [Tooltip("Assign your NavMeshAgent (NavMeshPlus 2D: set updateRotation=false, updateUpAxis=false).")]

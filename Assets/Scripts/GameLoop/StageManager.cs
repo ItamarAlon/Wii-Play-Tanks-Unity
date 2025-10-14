@@ -10,6 +10,9 @@ using Game.Gameplay.Tanks.Enemy;
 using Game.UI;
 using Game.Gameplay.Effects;
 using UnityEngine.SceneManagement;
+using Assets.Scripts.Gameplay.Tanks.Enemy;
+using UnityEngine.AI;
+using System.Linq;
 
 namespace Game.GameLoop
 {
@@ -71,22 +74,6 @@ namespace Game.GameLoop
             }
         }
 
-        //private IEnumerator StageRoutine(LevelDefinition def)
-        //{
-        //    SetGameplayEnabled(false);
-        //    inStagePreview = true;
-        //    float t = def.previewSeconds;
-        //    while (t > 0f)
-        //    {
-        //        if (banner) banner.Show(def.stageNumber, t);
-        //        t -= Time.unscaledDeltaTime;
-        //        yield return null;
-        //    }
-        //    if (banner) banner.Hide();
-        //    inStagePreview = false;
-        //    SetGameplayEnabled(true);
-        //}
-
         public void SetGameplayEnabled(bool enabled)
         {
             if (levelLoader.PlayerInstance)
@@ -97,13 +84,16 @@ namespace Game.GameLoop
             }
             foreach (var enemyTank in levelLoader.EnemyInstances)
             {
-                if (!enemyTank) continue;
-                var s1 = enemyTank.GetComponent<StationaryShooterAI>();
-                var s2 = enemyTank.GetComponent<MovingShooterAI>();
-                var motor = enemyTank.GetComponent<TankMotor>();
-                if (s1) s1.enabled = enabled;
-                if (s2) s2.enabled = enabled;
-                if (motor) motor.enabled = enabled;
+                if (!enemyTank) 
+                    continue;
+
+                EnemyAI[] aiScripts = enemyTank.GetComponents<EnemyAI>();
+                NavMeshAgent agent = enemyTank.GetComponent<NavMeshAgent>();
+
+                foreach (var script in aiScripts)
+                    script.enabled = enabled;
+                if (agent) 
+                    agent.enabled = enabled;
             }
         }
     }
