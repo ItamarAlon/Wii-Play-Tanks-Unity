@@ -6,15 +6,21 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.Gameplay.Level;
 using Game.UI;
+using System.Collections;
 
 namespace Game.GameLoop
 {
     public class RunManager : MonoBehaviour
     {
-        public int startingLives = 3;
-        public int currentLives { get; private set; }
-        public int totalKills { get; private set; }
-        public int currentStageIndex { get; private set; } = 0;
+        [SerializeField] private int startingLives = 3;
+        [SerializeField] private float previewTimeSeconds = 3f;
+
+        public int CurrentLives { get; private set; }
+        public int TotalKills { get; private set; }
+        public int CurrentStageIndex { get; private set; } = 0;
+        
+        private int CurrentStageNum { get => CurrentStageIndex + 1; }
+        private bool inStagePreview = false;
 
         public GameObject[] StageList;
         public LevelLoader levelLoader;
@@ -25,9 +31,9 @@ namespace Game.GameLoop
         {
             deactivateAllStages();
 
-            currentLives = startingLives;
-            totalKills = 0;
-            LoadStage(currentStageIndex, true);
+            CurrentLives = startingLives;
+            TotalKills = 0;
+            LoadStage(CurrentStageIndex, true);
             RefreshHUD();
 
             Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("PlayerBullet"), LayerMask.NameToLayer("Holes"));
@@ -44,48 +50,69 @@ namespace Game.GameLoop
 
         public void AddKill() 
         { 
-            totalKills++; 
+            TotalKills++; 
             RefreshHUD(); 
         }
 
         public void OnPlayerDied()
         {
-            currentLives--;
-            if (currentLives <= 0)
+            CurrentLives--;
+            if (CurrentLives <= 0)
             {
                 SceneManager.LoadScene("Title");
                 return;
             }
-            LoadStage(currentStageIndex, false);
+            LoadStage(CurrentStageIndex, false);
             RefreshHUD();
         }
 
         public void OnStageCleared()
         {
-            StageList[currentStageIndex].SetActive(false);
-            currentStageIndex++;
-            if (currentStageIndex >= StageList.Length)
+            StageList[CurrentStageIndex].SetActive(false);
+            CurrentStageIndex++;
+            if (CurrentStageIndex >= StageList.Length)
             {
                 SceneManager.LoadScene("Title");
                 return;
             }
-            LoadStage(currentStageIndex, true);
+            LoadStage(CurrentStageIndex, true);
             RefreshHUD();
         }
 
         private void LoadStage(int idx, bool firstTimeLoading)
         {
+            StopAllCoroutines();
+
             var currentStage = StageList[idx];
             currentStage.SetActive(true);
             stageManager.BeginStage(currentStage, firstTimeLoading);
+
+            StartCoroutine(StageRoutine());
         }
 
         private void RefreshHUD()
         {
             if (!hud) return;
-            hud.SetLives(currentLives);
-            hud.SetStage(currentStageIndex + 1);
-            hud.SetKills(totalKills);
+            hud.SetLives(CurrentLives);
+            hud.SetStage(CurrentStageIndex + 1);
+            hud.SetKills(TotalKills);
+        }
+
+        private IEnumerator StageRoutine()
+        {
+            stageManager.SetGameplayEnabled(false);
+            inStagePreview = true;
+            float t = previewTimeSeconds;
+            while (t > 0f)
+            {
+                if (stageManager.banner)
+                    stageManager.banner.Show(CurrentStageNum, t);
+                t -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+            if (stageManager.banner) stageManager.banner.Hide();
+            inStagePreview = false;
+            stageManager.SetGameplayEnabled(true);
         }
     }
 }

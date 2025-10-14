@@ -20,9 +20,8 @@ namespace Game.GameLoop
         public StageBanner banner;
         public DecalSpawner decals;
 
-        private bool _inPreview;
-        private int _aliveEnemies;
-        private int _enemiesInCurrentStage;
+        private int aliveEnemiesCount;
+        private int enemiesInCurrentStageCount;
 
         public void LoadGame()
         {
@@ -31,7 +30,6 @@ namespace Game.GameLoop
 
         public void BeginStage(GameObject def, bool firstTimeLoading)
         {
-            //StopAllCoroutines();
             if (firstTimeLoading)               
             {
                 levelLoader.Load(def);
@@ -40,10 +38,8 @@ namespace Game.GameLoop
             else
             {
                 levelLoader.Reload();
-                _aliveEnemies = _enemiesInCurrentStage;
+                aliveEnemiesCount = enemiesInCurrentStageCount;
             }
-            
-            //StartCoroutine(StageRoutine(def));
         }
 
         private void wirePlayerAndEnemies()
@@ -51,59 +47,60 @@ namespace Game.GameLoop
             var playerH = levelLoader.PlayerInstance.GetComponent<Health>();
             playerH.OnDeath += _ => run.OnPlayerDied();
 
-            _aliveEnemies = 0;
+            aliveEnemiesCount = 0;
             foreach (var e in levelLoader.EnemyInstances)
             {
                 var h = e.GetComponent<Health>();
                 if (h != null)
                 {
-                    _aliveEnemies++;
+                    aliveEnemiesCount++;
                     h.OnDeath += OnEnemyDeath;
                 }
             }
-            _enemiesInCurrentStage = _aliveEnemies;
+            enemiesInCurrentStageCount = aliveEnemiesCount;
         }
 
         private void OnEnemyDeath(Health h)
         {
-            _aliveEnemies--;
+            aliveEnemiesCount--;
             run.AddKill();
             if (decals) decals.PlaceX(h.transform.position);
-            if (_aliveEnemies <= 0 && !_inPreview)
+            if (aliveEnemiesCount <= 0)
             {
                 run.OnStageCleared();
             }
         }
 
-        private IEnumerator StageRoutine(LevelDefinition def)
-        {
-            SetGameplayEnabled(false);
-            _inPreview = true;
-            float t = def.previewSeconds;
-            while (t > 0f)
-            {
-                if (banner) banner.Show(def.stageNumber, t);
-                t -= Time.unscaledDeltaTime;
-                yield return null;
-            }
-            if (banner) banner.Hide();
-            _inPreview = false;
-            SetGameplayEnabled(true);
-        }
+        //private IEnumerator StageRoutine(LevelDefinition def)
+        //{
+        //    SetGameplayEnabled(false);
+        //    inStagePreview = true;
+        //    float t = def.previewSeconds;
+        //    while (t > 0f)
+        //    {
+        //        if (banner) banner.Show(def.stageNumber, t);
+        //        t -= Time.unscaledDeltaTime;
+        //        yield return null;
+        //    }
+        //    if (banner) banner.Hide();
+        //    inStagePreview = false;
+        //    SetGameplayEnabled(true);
+        //}
 
-        private void SetGameplayEnabled(bool enabled)
+        public void SetGameplayEnabled(bool enabled)
         {
             if (levelLoader.PlayerInstance)
             {
-                var m = levelLoader.PlayerInstance.GetComponent<PlayerTankController>();
-                if (m) m.enabled = enabled;
+                var playerTank = levelLoader.PlayerInstance.GetComponent<PlayerTankController>();
+                if (playerTank) 
+                    playerTank.enabled = enabled;
             }
-            foreach (var e in levelLoader.EnemyInstances)
+            foreach (var enemyTank in levelLoader.EnemyInstances)
             {
-                if (!e) continue;
-                var s1 = e.GetComponent<StationaryShooterAI>();
-                var s2 = e.GetComponent<MovingShooterAI>();
-                var motor = e.GetComponent<TankMotor>();
+                if (!enemyTank) continue;
+                var s1 = enemyTank.GetComponent<StationaryShooterAI>();
+                var s2 = enemyTank.GetComponent<MovingShooterAI>();
+                var motor = enemyTank.GetComponent<TankMotor>();
                 if (s1) s1.enabled = enabled;
                 if (s2) s2.enabled = enabled;
                 if (motor) motor.enabled = enabled;
