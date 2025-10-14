@@ -351,6 +351,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4542270977892972629}
   - component: {fileID: 2797000229245333766}
+  - component: {fileID: 87175243931021223}
   m_Layer: 6
   m_Name: Hull
   m_TagString: Untagged
@@ -428,3 +429,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &87175243931021223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6860890900981299683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f6dddbada86a5d499346dc1ca84cc50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
