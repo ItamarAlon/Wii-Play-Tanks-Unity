@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
   - component: {fileID: 7923056913818435197}
+  - component: {fileID: 3778763086416148957}
   m_Layer: 7
   m_Name: StationaryTank
   m_TagString: Enemy
@@ -149,7 +150,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 201a84bfd2379fe4e9010f7feef17784, type: 3}
   m_Name: 
@@ -173,6 +174,23 @@ MonoBehaviour:
   overrideBulletSpeedUPS: 0
   oneShotPerOpportunity: 1
   simulationFps: 60
+--- !u!114 &3778763086416148957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89c3d127ceeb45b45a19379b9d71fb4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turretPivot: {fileID: 4478932648053384618}
+  target: {fileID: 0}
+  word29_TurretAngleOffset: 170
+  word39_TurretTurnSpeedRadPerFrame: 0.01
+  word40_TurretTargetTimer: 60
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0

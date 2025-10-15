@@ -103,12 +103,12 @@ namespace Game.GameLoop
         {
             stageManager.SetGameplayEnabled(false);
             inStagePreview = true;
-            float time = previewTimeSeconds;
-            while (time > 0f)
+            float t = previewTimeSeconds;
+            while (t > 0f)
             {
                 if (banner)
-                    banner.Show(CurrentStageNum, time);
-                time -= Time.unscaledDeltaTime;
+                    banner.Show(CurrentStageNum, t);
+                t -= Time.unscaledDeltaTime;
                 yield return null;
             }
             if (banner) 

@@ -9,16 +9,44 @@ namespace Assets.Scripts.Core
 {
     public static class GeneralFunc
     {
-        public static Vector2 DirFromAngle(float angleDeg)
+        public static Vector2 AngleToVector(float angleDeg)
         {
             float rad = angleDeg * Mathf.Deg2Rad;
             return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
         }
 
+        public static Vector2 AngleToVector(float angleDeg, float magnitude)
+        {
+            Vector2 newVector = AngleToVector(angleDeg);
+            return ChangeVectorMagnitude(newVector, magnitude);
+        }
+
+        public static float VectorToAngle(Vector2 vector)
+        {
+            return Vector2.Angle(Vector2.right, vector);
+        }
+
+        public static Vector2 ChangeVectorMagnitude(Vector2 vector, float magnitude)
+        {
+            return vector.normalized * magnitude;
+        }
+
+        public static Vector2 RotateVector(Vector2 vector, float angleToRotateBy)
+        {
+            float givenVectorAngle = VectorToAngle(vector);
+            float rotatedVectorAngle = ConvertToAngle(givenVectorAngle + angleToRotateBy);
+            return AngleToVector(rotatedVectorAngle, vector.magnitude);
+        }
+
+        public static Vector2 VectorFromOnePointToAnother(Transform from, Transform to)
+        {
+            return to.position - from.position;
+        }
+
         /// <summary>
         /// converts a number to a degree: between 0 and 360
         /// </summary>
-        public static float ConvertToDegree(float num)
+        public static float ConvertToAngle(float num)
         {
             return Mathf.Repeat(num, 360f);
         }
