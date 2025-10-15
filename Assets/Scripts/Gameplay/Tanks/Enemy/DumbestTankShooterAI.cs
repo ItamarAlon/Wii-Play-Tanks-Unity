@@ -90,7 +90,7 @@ public class TankTurretShooterAI : EnemyAI
 
             if (target && (!oneShotPerOpportunity || !hasPendingShot) && shooterConfigured())
             {
-                Vector2 origin = shooter && shooter.muzzle ? (Vector2)shooter.muzzle.position
+                Vector2 origin = shooter && shooter.Muzzle ? (Vector2)shooter.Muzzle.position
                                                            : (Vector2)turretPivot.position;
                 Vector2 toTarget = (Vector2)target.position - origin;
                 float dist = toTarget.magnitude;
@@ -135,7 +135,7 @@ public class TankTurretShooterAI : EnemyAI
         float err = Mathf.Abs(Mathf.DeltaAngle(getAngleDeg(turret.up), desiredTurretAngleDeg));
         if (err > fireAngleToleranceDeg) return;
 
-        Vector2 origin = shooter && shooter.muzzle ? (Vector2)shooter.muzzle.position
+        Vector2 origin = shooter && shooter.Muzzle ? (Vector2)shooter.Muzzle.position
                                                    : (Vector2)turretPivot.position;
         Vector2 toTarget = target ? (Vector2)target.position - origin : Vector2.zero;
         float dist = toTarget.magnitude;
@@ -164,8 +164,8 @@ public class TankTurretShooterAI : EnemyAI
     bool shooterConfigured()
     {
         if (!shooter) return false;
-        if (!shooter.muzzle) return false;
-        if (!shooter.bulletPrefab) return false;
+        if (!shooter.Muzzle) return false;
+        if (!shooter.BulletPrefab) return false;
         return true;
     }
 
@@ -179,7 +179,7 @@ public class TankTurretShooterAI : EnemyAI
     float getBulletSpeedUPS()
     {
         if (overrideBulletSpeedUPS > 0f) return overrideBulletSpeedUPS;
-        return shooter ? shooter.muzzleSpeed : 0f;
+        return shooter ? shooter.MuzzleSpeed : 0f;
     }
 
     static float getAngleDeg(Vector2 dir) => Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;

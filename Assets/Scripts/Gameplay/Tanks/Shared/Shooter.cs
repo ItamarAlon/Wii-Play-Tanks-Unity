@@ -5,7 +5,6 @@
 using UnityEngine;
 using Game.Gameplay.Projectiles;
 using UnityEngine.Pool;
-using UnityEngine.VFX;
 using System.Collections.Generic;
 using System.Collections;
 
@@ -13,9 +12,9 @@ namespace Game.Gameplay.Tanks.Shared
 {
     public class Shooter : MonoBehaviour
     {
-        public Transform muzzle; 
-        public Bullet bulletPrefab; 
-        public float muzzleSpeed = 6f; 
+        [field: SerializeField] public Transform Muzzle { get; private set; }
+        [field: SerializeField] public Bullet BulletPrefab { get; private set; }
+        [field: SerializeField] public float MuzzleSpeed { get; private set; } = 3.76f;
 
         [SerializeField] float cooldownSeconds = 0.25f;
         [SerializeField] int maxActive = 4;
@@ -38,19 +37,19 @@ namespace Game.Gameplay.Tanks.Shared
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
-            bulletPrefab.MaxBounces = maxBounces;
+            BulletPrefab.MaxBounces = maxBounces;
         }
 
         public void TryFire(Vector2 dir)
         {
             if (isCooldownActive) return;
             if (_active >= maxActive) return;
-            if (!bulletPrefab || !muzzle) return;
+            if (!BulletPrefab || !Muzzle) return;
 
             Bullet bullet = _bulletPool.Get();
             activeBullets.Add(bullet);
 
-            bullet.Launch(dir.normalized * muzzleSpeed);
+            bullet.Launch(dir.normalized * MuzzleSpeed);
             _active++;
             startCooldown();
         }
@@ -69,7 +68,7 @@ namespace Game.Gameplay.Tanks.Shared
 
         public void TryFire()
         {
-            TryFire(muzzle.up);
+            TryFire(Muzzle.up);
         }
 
         public void ReleaseBullet(Bullet bullet)
@@ -96,7 +95,7 @@ namespace Game.Gameplay.Tanks.Shared
 
         private Bullet createBullet()
         {
-            Bullet bullet = Instantiate(bulletPrefab, muzzle.position, Quaternion.identity);
+            Bullet bullet = Instantiate(BulletPrefab, Muzzle.position, Quaternion.identity);
             bullet.SetOwner(this);
 
             if (isPlayer)
@@ -110,7 +109,7 @@ namespace Game.Gameplay.Tanks.Shared
         private void activateWhenGettingBulletFromPool(Bullet bullet)
         {
             ignoreCollisionWithBullet(bullet);
-            bullet.transform.position = muzzle.position;
+            bullet.transform.position = Muzzle.position;
             bullet.gameObject.SetActive(true);
         }
 

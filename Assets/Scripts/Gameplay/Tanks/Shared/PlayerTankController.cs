@@ -30,7 +30,7 @@ namespace Game.Gameplay.Tanks.Shared
             Vector2 move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
             _motor.SetDesiredVelocity(move);
 
-            if (Input.GetKey(fireKey) && shooter && shooter.muzzle)
+            if (Input.GetKey(fireKey) && shooter && shooter.Muzzle)
             {
                 shooter.TryFire();
             }
