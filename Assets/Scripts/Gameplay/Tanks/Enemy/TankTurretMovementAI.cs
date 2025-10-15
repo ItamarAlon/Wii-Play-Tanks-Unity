@@ -16,9 +16,12 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] float word39_TurretTurnSpeedRadPerFrame = 0.08f;
         [SerializeField] int word40_TurretTargetTimer = 40;
 
-        private float fps = 60;
+        private float fps = 3;
+        private float step;
         private Vector2 desiredTurretLookingDirection;
         private int frameCounter = 0;
+        private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
+        private bool isTurretPointingAtDesired = false;
 
         void Awake()
         {
@@ -26,65 +29,46 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 desiredTurretLookingDirection = turretPivot.up;
             else
                 desiredTurretLookingDirection = Vector2.zero;
+
+            float anglePerFrame = word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
+            step = anglePerFrame * fps * Time.deltaTime;
+            //StartCoroutine(routine());
         }
 
         void Update()
         {
             if (frameCounter == 0)
-                generateLookingDirectionAndSlowlyRotateTurretTowardsIt();
+                generateDesiredLookingDirection();
             else if (frameCounter == word40_TurretTargetTimer)
                 frameCounter = -1;
 
+            rotateTurretTowardsDesired();
             frameCounter++;
         }
 
-        private void generateLookingDirectionAndSlowlyRotateTurretTowardsIt()
+        private void generateDesiredLookingDirection()
         {
             Vector2 vectorFromTankToTarget = GeneralFunc.VectorFromOnePointToAnother(this.transform, target.transform);
             float randomOffsetAngle = Random.Range(-word29_TurretAngleOffset, word29_TurretAngleOffset);
             desiredTurretLookingDirection = GeneralFunc.RotateVector(vectorFromTankToTarget, randomOffsetAngle);
-            rotateTurretTowardDesiredSlowly();
+            isTurretPointingAtDesired = false;
         }
 
-        private bool rotateTurretTowardDesired(float step)
+        private void rotateTurretTowardsDesired()
         {
-            if (isTurretLookingAtDesired())
-                return true;
+            if (isTurretPointingAtDesired)
+                return;
 
-            float deltaAngle = Vector2.Angle(turretPivot.up, desiredTurretLookingDirection);
+            float desiredAngle = GeneralFunc.VectorToAngle(desiredTurretLookingDirection) - 90;
+            float angleToRotateTo = Mathf.MoveTowardsAngle(CurrentLookingAngle, desiredAngle, step);
+            GeneralFunc.RotateTransform(ref turretPivot, angleToRotateTo);
 
-            if (Mathf.Abs(deltaAngle) <= step)
-            {
-                turretPivot.up = desiredTurretLookingDirection;
-                return true;
-            }
-            else
-            {
-                step *= Mathf.Sign(deltaAngle);
-                turretPivot.up = GeneralFunc.RotateVector(turretPivot.up, step);
-                return false;
-            }
+            isTurretPointingAtDesired = angleToRotateTo == desiredAngle;
         }
 
-        private IEnumerator rotateTurretTowardDesiredRoutine()
-        {
-            float anglePerFrame = word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
-            float step = anglePerFrame * fps * Time.deltaTime;
-
-            while (!rotateTurretTowardDesired(step))
-            {
-                yield return null;
-            }
-        }
-
-        private void rotateTurretTowardDesiredSlowly()
-        {
-            StartCoroutine(rotateTurretTowardDesiredRoutine());
-        }
-
-        private bool isTurretLookingAtDesired()
-        {
-            return (Vector2)turretPivot.up == desiredTurretLookingDirection;
-        }
+        //private IEnumerator routine()
+        //{
+        //    int counter = word40_TurretTargetTimer;
+        //}
     }
 }

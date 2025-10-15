@@ -23,7 +23,7 @@ namespace Assets.Scripts.Core
 
         public static float VectorToAngle(Vector2 vector)
         {
-            return Vector2.Angle(Vector2.right, vector);
+            return Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
         }
 
         public static Vector2 ChangeVectorMagnitude(Vector2 vector, float magnitude)
@@ -41,6 +41,11 @@ namespace Assets.Scripts.Core
         public static Vector2 VectorFromOnePointToAnother(Transform from, Transform to)
         {
             return to.position - from.position;
+        }
+
+        public static void RotateTransform(ref Transform toRotate, float angleToRotateBy)
+        {
+            toRotate.rotation = Quaternion.Euler(0f, 0f, angleToRotateBy);
         }
 
         /// <summary>
