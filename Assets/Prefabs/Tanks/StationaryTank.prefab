@@ -158,7 +158,7 @@ MonoBehaviour:
   target: {fileID: 0}
   word29_TurretAngleOffset: 170
   word39_TurretTurnSpeedRadPerFrame: 0.01
-  word40_TurretTargetTimer: 60
+  word40_TurretTargetTimer: 120
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0

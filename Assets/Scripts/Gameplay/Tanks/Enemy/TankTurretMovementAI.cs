@@ -19,7 +19,6 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         private float fps = 3;
         private float step;
         private Vector2 desiredTurretLookingDirection;
-        private int frameCounter = 0;
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
         private bool isTurretPointingAtDesired = false;
 
@@ -32,18 +31,16 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
             float anglePerFrame = word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
             step = anglePerFrame * fps * Time.deltaTime;
-            //StartCoroutine(routine());
+        }
+
+        void Start()
+        {
+            StartCoroutine(generateDesiredDirectionRoutine());
         }
 
         void Update()
         {
-            if (frameCounter == 0)
-                generateDesiredLookingDirection();
-            else if (frameCounter == word40_TurretTargetTimer)
-                frameCounter = -1;
-
             rotateTurretTowardsDesired();
-            frameCounter++;
         }
 
         private void generateDesiredLookingDirection()
@@ -66,9 +63,14 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
             isTurretPointingAtDesired = angleToRotateTo == desiredAngle;
         }
 
-        //private IEnumerator routine()
-        //{
-        //    int counter = word40_TurretTargetTimer;
-        //}
+        private IEnumerator generateDesiredDirectionRoutine()
+        {
+            while (true)
+            {
+                generateDesiredLookingDirection();
+                for (int i = 0; i < word40_TurretTargetTimer; i++)
+                    yield return null;
+            }
+        }
     }
 }
