@@ -7,20 +7,22 @@ using Game.Gameplay.Projectiles;
 using UnityEngine.Pool;
 using UnityEngine.VFX;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Game.Gameplay.Tanks.Shared
 {
     public class Shooter : MonoBehaviour
     {
-        public Transform muzzle;
-        public Bullet bulletPrefab;
-        public float muzzleSpeed = 6f;
-        public float cooldown = 0.25f;
-        public int maxActive = 4;
-        public bool isPlayer;
-        public int maxBounces = 2;
+        public Transform muzzle; 
+        public Bullet bulletPrefab; 
+        public float muzzleSpeed = 6f; 
 
-        private float _cooldownTimer;
+        [SerializeField] float cooldownSeconds = 0.25f;
+        [SerializeField] int maxActive = 4;
+        [SerializeField] bool isPlayer;
+        [SerializeField] int maxBounces = 2;
+
+        private bool isCooldownActive = false;
         private int _active;
         private Collider2D _collider;
         private ObjectPool<Bullet> _bulletPool;
@@ -41,7 +43,7 @@ namespace Game.Gameplay.Tanks.Shared
 
         public void TryFire(Vector2 dir)
         {
-            if (_cooldownTimer > 0f) return;
+            if (isCooldownActive) return;
             if (_active >= maxActive) return;
             if (!bulletPrefab || !muzzle) return;
 
@@ -50,7 +52,19 @@ namespace Game.Gameplay.Tanks.Shared
 
             bullet.Launch(dir.normalized * muzzleSpeed);
             _active++;
-            _cooldownTimer = cooldown;
+            startCooldown();
+        }
+
+        private void startCooldown()
+        {
+            StartCoroutine(waitCooldownRoutine());
+        }
+
+        private IEnumerator waitCooldownRoutine()
+        {
+            isCooldownActive = true;
+            yield return new WaitForSeconds(cooldownSeconds);
+            isCooldownActive = false;
         }
 
         public void TryFire()
@@ -78,11 +92,6 @@ namespace Game.Gameplay.Tanks.Shared
             }
             activeBullets.Clear();
             _active = 0;
-        }
-
-        void Update()
-        {
-            if (_cooldownTimer > 0f) _cooldownTimer -= Time.deltaTime;
         }
 
         private Bullet createBullet()

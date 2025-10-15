@@ -18,17 +18,12 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         private float fps = 3;
         private float step;
-        private Vector2 desiredTurretLookingDirection;
+        private float desiredAngle;
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
         private bool isTurretPointingAtDesired = false;
 
         void Awake()
         {
-            if (turretPivot)
-                desiredTurretLookingDirection = turretPivot.up;
-            else
-                desiredTurretLookingDirection = Vector2.zero;
-
             float anglePerFrame = word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
             step = anglePerFrame * fps * Time.deltaTime;
         }
@@ -47,7 +42,8 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         {
             Vector2 vectorFromTankToTarget = GeneralFunc.VectorFromOnePointToAnother(this.transform, target.transform);
             float randomOffsetAngle = Random.Range(-word29_TurretAngleOffset, word29_TurretAngleOffset);
-            desiredTurretLookingDirection = GeneralFunc.RotateVector(vectorFromTankToTarget, randomOffsetAngle);
+            Vector2 desiredTurretLookingDirection = GeneralFunc.RotateVector(vectorFromTankToTarget, randomOffsetAngle);
+            desiredAngle = GeneralFunc.VectorToAngle(desiredTurretLookingDirection) - 90;
             isTurretPointingAtDesired = false;
         }
 
@@ -55,8 +51,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         {
             if (isTurretPointingAtDesired)
                 return;
-
-            float desiredAngle = GeneralFunc.VectorToAngle(desiredTurretLookingDirection) - 90;
+            
             float angleToRotateTo = Mathf.MoveTowardsAngle(CurrentLookingAngle, desiredAngle, step);
             GeneralFunc.RotateTransform(ref turretPivot, angleToRotateTo);
 
