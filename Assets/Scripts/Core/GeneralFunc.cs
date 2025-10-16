@@ -18,7 +18,7 @@ namespace Assets.Scripts.Core
         public static Vector2 AngleToVector(float angleDeg, float magnitude)
         {
             Vector2 newVector = AngleToVector(angleDeg);
-            return ChangeVectorMagnitude(newVector, magnitude);
+            return SetMagnitude(newVector, magnitude);
         }
 
         public static float VectorToAngle(Vector2 vector)
@@ -26,7 +26,7 @@ namespace Assets.Scripts.Core
             return Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
         }
 
-        public static Vector2 ChangeVectorMagnitude(Vector2 vector, float magnitude)
+        public static Vector2 SetMagnitude(Vector2 vector, float magnitude)
         {
             return vector.normalized * magnitude;
         }
