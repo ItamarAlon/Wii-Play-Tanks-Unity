@@ -12,12 +12,11 @@ namespace Game.Gameplay.Projectiles
     [RequireComponent(typeof(Collider2D))]
     public class Bullet : MonoBehaviour
     {
-        public int MaxBounces { get; set; } = 2;
+        public int MaxBounces { get; set; } = 1;
 
         private Rigidbody2D _rb;
         private int _bounces;
         private Shooter _owner;
-        private enum TankType { Player, Enemy};
 
         void Awake()
         {
@@ -34,9 +33,9 @@ namespace Game.Gameplay.Projectiles
 
         void OnCollisionEnter2D(Collision2D col)
         {
-            string ln = LayerMask.LayerToName(col.collider.gameObject.layer);
+            string layer = LayerMask.LayerToName(col.collider.gameObject.layer);
             // Hit a tank or a mine ? kill & despawn
-            if (ln == "Player" || ln == "Enemy" || ln == "Mines")
+            if (layer == "Tank" || layer == "Bullet" || layer == "Mines")
             {
                 var h = col.collider.GetComponentInParent<Health>();
                 if (h)
@@ -46,10 +45,10 @@ namespace Game.Gameplay.Projectiles
             }
 
             // Ricochet on walls
-            if (ln == "Walls")
+            if (layer == "Walls")
             {
                 _bounces++;
-                if (_bounces >= MaxBounces)
+                if (_bounces > MaxBounces)
                     Despawn();
                 return;
             }
@@ -61,23 +60,6 @@ namespace Game.Gameplay.Projectiles
         void Despawn()
         {
             _owner?.ReleaseBullet(this);
-        }
-
-        private TankType playerOrEnemy(GameObject obj)
-        {
-            string layerStr = LayerMask.LayerToName(obj.layer);
-
-            switch (layerStr)
-            {
-                case "PlayerBullet":
-                case "Player":
-                    return TankType.Player;
-                case "EnemyBullet":
-                case "Enemy":
-                    return TankType.Enemy;
-                default:
-                    return 0;
-            }
         }
     }
 }

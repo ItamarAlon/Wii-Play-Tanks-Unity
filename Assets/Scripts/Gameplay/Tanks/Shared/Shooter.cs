@@ -97,12 +97,6 @@ namespace Game.Gameplay.Tanks.Shared
         {
             Bullet bullet = Instantiate(BulletPrefab, Muzzle.position, Quaternion.identity);
             bullet.SetOwner(this);
-
-            if (isPlayer)
-                bullet.gameObject.layer = LayerMask.NameToLayer("PlayerBullet");
-            else
-                bullet.gameObject.layer = LayerMask.NameToLayer("EnemyBullet");
-
             return bullet;
         }
 

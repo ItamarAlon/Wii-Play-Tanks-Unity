@@ -22,10 +22,6 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
         private bool isTurretPointingAtDesired = false;
 
-        void Awake()
-        {          
-        }
-
         void Start()
         {
             if (!turretPivot) Debug.LogError($"{name}: turretPivot not assigned");

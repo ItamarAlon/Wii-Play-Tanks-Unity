@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8161460295810554474}
   - component: {fileID: 4338627100847286774}
   - component: {fileID: 657623285059520086}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -166,8 +166,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec2cdf51691153749b49303529ed6d16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxBounces: 2
-  lifeSeconds: 10
 --- !u!1 &6243555381298106502
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5571555071288306973}
   - component: {fileID: 2049560603498673962}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

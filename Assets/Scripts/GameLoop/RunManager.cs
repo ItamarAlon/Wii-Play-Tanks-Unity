@@ -37,8 +37,7 @@ namespace Game.GameLoop
             LoadStage(CurrentStageIndex, true);
             RefreshHUD();
 
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("PlayerBullet"), LayerMask.NameToLayer("Holes"));
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("EnemyBullet"), LayerMask.NameToLayer("Holes"));
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), LayerMask.NameToLayer("Holes"));
         }
 
         private void deactivateAllStages()

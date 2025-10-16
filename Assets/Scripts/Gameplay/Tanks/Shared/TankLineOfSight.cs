@@ -9,14 +9,15 @@ using static UnityEngine.UI.Image;
 
 namespace Assets.Scripts.Gameplay.Tanks.Enemy
 {
-    public class TankShooterHandlerAI : EnemyAI
+    public class TankLineOfSight : MonoBehaviour
     {
-        [SerializeField] float angle = 15f;
+        [SerializeField] float angle = 20;
 
         private Beam[] beams;
         private int numOfBeams;
         public bool PlayerInSight => beams.Any(beam => beam.PlayerInSight);
-        public bool EnemyInSight => beams.Any(beams => beams.EnemyInSight);
+        public bool EnemyInSight => beams.Any(beam => beam.EnemyInSight);
+        public event EventHandler ShootingOpportunityFound;
 
         void OnValidate()
         {
@@ -25,7 +26,8 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         void Awake()
         {
-            numOfBeams = GetComponentInParent<Shooter>().MaxBounces;
+            Shooter shooter = GetComponentInParent<Shooter>();
+            numOfBeams = shooter ? shooter.MaxBounces + 1 : 1;
             beams = new Beam[numOfBeams];
             for (int i = 0; i < numOfBeams; i++)
                 beams[i] = new Beam(angle);
@@ -39,10 +41,23 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 if (beams[i - 1].HitPoint.HasValue)
                     beams[i].Run(beams[i - 1].HitPoint.Value, beams[i - 1].ReflectedHitDirection.Value);
             }
-            
+
+            checkShootingOpportunity();
+
             Debug.Log(PlayerInSight);
             foreach (var beam in beams)
                 drawBeamDebug(beam);
+        }
+
+        private void checkShootingOpportunity()
+        {
+            if (PlayerInSight && !EnemyInSight)
+                OnShootingOpportunityFound(EventArgs.Empty);
+        }
+
+        protected virtual void OnShootingOpportunityFound(EventArgs e)
+        {
+            ShootingOpportunityFound?.Invoke(this, e);
         }
 
         private void drawBeamDebug(Beam beam)
@@ -62,6 +77,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
             private const float maxSightDistance = 40f;
             private const float epsilon = 0.002f;
             private readonly LayerMask wallMask = LayerMask.GetMask("Walls");
+            private readonly LayerMask tankMask = LayerMask.GetMask("Tank");
             private readonly float angle = 0;
 
             public bool PlayerInSight { get => playersInSight > 0; }
@@ -88,10 +104,10 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 Origin = isBeamFirstInChain ? origin : origin + direction * epsilon;
                 Direction = direction;
                 Radius = RadiusToNearestWall();
-                UpdateSight_NoCollider(Radius);
+                updateSight(Radius);
             }
 
-            float RadiusToNearestWall()
+            private float RadiusToNearestWall()
             {
                 RaycastHit2D hit = Physics2D.Raycast(Origin, Direction, maxSightDistance, wallMask);
                 if (hit.collider)
@@ -108,9 +124,9 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 }
             }
 
-            void UpdateSight_NoCollider(float radius)
+            private void updateSight(float radius)
             {
-                Collider2D[] hits = Physics2D.OverlapCircleAll(Origin, radius);
+                Collider2D[] hits = Physics2D.OverlapCircleAll(Origin, radius, tankMask);
 
                 int playerCount = 0;
                 int enemyCount = 0;

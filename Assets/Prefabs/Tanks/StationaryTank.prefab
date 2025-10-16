@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
   - component: {fileID: 3778763086416148957}
-  m_Layer: 7
+  - component: {fileID: 81903426926603415}
+  m_Layer: 9
   m_Name: StationaryTank
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -138,10 +139,10 @@ MonoBehaviour:
   <Muzzle>k__BackingField: {fileID: 4699912395469050728}
   <BulletPrefab>k__BackingField: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
   <MuzzleSpeed>k__BackingField: 3.76
+  <MaxBounces>k__BackingField: 1
   cooldownSeconds: 0.25
-  maxActive: 4
+  maxActive: 1
   isPlayer: 0
-  maxBounces: 2
 --- !u!114 &3778763086416148957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +160,22 @@ MonoBehaviour:
   word29_TurretAngleOffset: 170
   word39_TurretTurnSpeedRadPerFrame: 0.01
   word40_TurretTargetTimer: 120
+--- !u!114 &81903426926603415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95920d665eeda424daef8ce1868a8840, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  word35_RandomTimerA: 60
+  word36_RandomTimerB: 90
+  shooter: {fileID: 4634876464340005560}
+  lineOfSight: {fileID: 703282477265961098}
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
@@ -168,7 +185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4478932648053384618}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: TurretPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -201,7 +218,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4784823741860575744}
   - component: {fileID: 6837061026906920055}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,9 +305,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4699912395469050728}
-  - component: {fileID: 4646294284421679838}
   - component: {fileID: 703282477265961098}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Muzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -312,56 +328,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4784823741860575744}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!60 &4646294284421679838
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5488301218007440225}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 1
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0, y: 0}
-      - {x: 0, y: 0}
-      - {x: 0, y: 0}
-  m_UseDelaunayMesh: 0
 --- !u!114 &703282477265961098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,14 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27effcd01837c074495cacb088e77371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionMask:
-    serializedVersion: 2
-    m_Bits: 0
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  maxSightDistance: 40
-  AngleDeg: 15
+  angle: 20
 --- !u!1 &6860890900981299683
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,7 +351,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4542270977892972629}
   - component: {fileID: 2797000229245333766}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Hull
   m_TagString: Untagged
   m_Icon: {fileID: 0}
