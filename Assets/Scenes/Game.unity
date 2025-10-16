@@ -1754,6 +1754,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1441490844}
   m_CullTransparentMesh: 1
+--- !u!1 &1584539156 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8193559306292501570, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
+  m_PrefabInstance: {fileID: 2125389090}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1584539158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1584539156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27effcd01837c074495cacb088e77371, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  angle: 15
 --- !u!1 &1609307458
 GameObject:
   m_ObjectHideFlags: 0
@@ -2407,7 +2425,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2628055856450503296, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
       propertyPath: m_ColliderPaths.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2628055856450503296, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
       propertyPath: m_CompositePaths.m_Paths.Array.size
@@ -2559,7 +2577,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6145961104276490963, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8955411379662675047, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2607,7 +2625,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5702066814328455577, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 402973517}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8193559306292501570, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1584539158}
   m_SourcePrefab: {fileID: 100100000, guid: bf9cba261bdfa8442aa5a491a9afd8a6, type: 3}
 --- !u!4 &2125389091 stripped
 Transform:

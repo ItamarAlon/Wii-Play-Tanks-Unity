@@ -1,4 +1,8 @@
 ﻿using Assets.Scripts.Core;
+using Game.Gameplay.Tanks.Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEngine.UI.Image;
@@ -9,8 +13,10 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
     {
         [SerializeField] float angle = 15f;
 
-        private Beam beam;
-        private Beam beam2;
+        private Beam[] beams;
+        private int numOfBeams;
+        public bool PlayerInSight => beams.Any(beam => beam.PlayerInSight);
+        public bool EnemyInSight => beams.Any(beams => beams.EnemyInSight);
 
         void OnValidate()
         {
@@ -19,21 +25,24 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         void Awake()
         {
-            beam = new Beam(angle);
-            beam2 = new Beam(angle);
+            numOfBeams = GetComponentInParent<Shooter>().MaxBounces;
+            beams = new Beam[numOfBeams];
+            for (int i = 0; i < numOfBeams; i++)
+                beams[i] = new Beam(angle);
         }
 
         void Update()
         {
-            beam.Run(transform.position, transform.up);
-            drawBeamDebug(beam);
-            if (beam.HitPoint.HasValue)
-            { 
-                beam2.Run(beam.HitPoint.Value, beam.ReflectedHitDirection.Value, false);
-                drawBeamDebug(beam2);
+            beams[0].Run(transform.position, transform.up, true);
+            for (int i = 1; i < numOfBeams; i++)
+            {
+                if (beams[i - 1].HitPoint.HasValue)
+                    beams[i].Run(beams[i - 1].HitPoint.Value, beams[i - 1].ReflectedHitDirection.Value);
             }
-       
-            Debug.Log(beam.PlayerInSight || beam2.PlayerInSight);
+            
+            Debug.Log(PlayerInSight);
+            foreach (var beam in beams)
+                drawBeamDebug(beam);
         }
 
         private void drawBeamDebug(Beam beam)
@@ -74,7 +83,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 this.angle = angle;
             }
 
-            public void Run(Vector2 origin, Vector2 direction, bool isBeamFirstInChain = true)
+            public void Run(Vector2 origin, Vector2 direction, bool isBeamFirstInChain = false)
             {
                 Origin = isBeamFirstInChain ? origin : origin + direction * epsilon;
                 Direction = direction;

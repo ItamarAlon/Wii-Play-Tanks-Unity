@@ -15,11 +15,11 @@ namespace Game.Gameplay.Tanks.Shared
         [field: SerializeField] public Transform Muzzle { get; private set; }
         [field: SerializeField] public Bullet BulletPrefab { get; private set; }
         [field: SerializeField] public float MuzzleSpeed { get; private set; } = 3.76f;
+        [field: SerializeField] public int MaxBounces { get; private set; } = 2;
 
         [SerializeField] float cooldownSeconds = 0.25f;
         [SerializeField] int maxActive = 4;
         [SerializeField] bool isPlayer;
-        [SerializeField] int maxBounces = 2;
 
         private bool isCooldownActive = false;
         private int _active;
@@ -37,7 +37,7 @@ namespace Game.Gameplay.Tanks.Shared
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
-            BulletPrefab.MaxBounces = maxBounces;
+            BulletPrefab.MaxBounces = MaxBounces;
         }
 
         public void TryFire(Vector2 dir)
