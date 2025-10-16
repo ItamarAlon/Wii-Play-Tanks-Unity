@@ -10,6 +10,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] float angle = 15f;
 
         private Beam beam;
+        private Beam beam2;
 
         void OnValidate()
         {
@@ -19,31 +20,39 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         void Awake()
         {
             beam = new Beam(angle);
+            beam2 = new Beam(angle);
         }
 
         void Update()
         {
-            beam.CheckForTanksInSight(transform.position, transform.up);
-
-            drawBeamDebug();
+            beam.Run(transform.position, transform.up);
+            drawBeamDebug(beam);
+            if (beam.HitPoint.HasValue)
+            { 
+                beam2.Run(beam.HitPoint.Value, beam.ReflectedHitDirection.Value, false);
+                drawBeamDebug(beam2);
+            }
+       
+            Debug.Log(beam.PlayerInSight || beam2.PlayerInSight);
         }
 
-        private void drawBeamDebug()
+        private void drawBeamDebug(Beam beam)
         {
 #if UNITY_EDITOR
             // visualize edges with current dynamic radius
-            Debug.DrawRay(beam.Origin, beam.Left.normalized * beam.Duration, Color.green);
-            Debug.DrawRay(beam.Origin, beam.Right.normalized * beam.Duration, Color.green);
+            Debug.DrawRay(beam.Origin, beam.Left.normalized * beam.Radius, Color.green);
+            Debug.DrawRay(beam.Origin, beam.Right.normalized * beam.Radius, Color.green);
 
             // visualize straight-ahead ray used to compute radius
-            Debug.DrawRay(beam.Origin, beam.Direction.normalized * beam.Duration, Color.yellow);
+            Debug.DrawRay(beam.Origin, beam.Direction.normalized * beam.Radius, Color.yellow);
 #endif
         }
 
         private class Beam
         {
             private const float maxSightDistance = 40f;
-            private readonly LayerMask wallMask = LayerMask.NameToLayer("Walls");
+            private const float epsilon = 0.002f;
+            private readonly LayerMask wallMask = LayerMask.GetMask("Walls");
             private readonly float angle = 0;
 
             public bool PlayerInSight { get => playersInSight > 0; }
@@ -52,7 +61,9 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
             public Vector2 Direction { get; private set; } 
             public Vector2 Left => Utils.RotateVector(Direction, angle);
             public Vector2 Right => Utils.RotateVector(Direction, -angle);
-            public float Duration { get; private set; }
+            public Vector2? HitPoint { get; private set; }
+            public Vector2? ReflectedHitDirection { get; private set; }
+            public float Radius { get; private set; }
 
             private int playersInSight;
             private int enemiesInSight;
@@ -63,18 +74,29 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                 this.angle = angle;
             }
 
-            public void CheckForTanksInSight(Vector2 origin, Vector2 direction)
+            public void Run(Vector2 origin, Vector2 direction, bool isBeamFirstInChain = true)
             {
-                Origin = origin;
+                Origin = isBeamFirstInChain ? origin : origin + direction * epsilon;
                 Direction = direction;
-                Duration = RadiusToNearestWall();
-                UpdateSight_NoCollider(Duration);
+                Radius = RadiusToNearestWall();
+                UpdateSight_NoCollider(Radius);
             }
 
             float RadiusToNearestWall()
             {
-                RaycastHit2D hit = Physics2D.Raycast(Origin, Direction, wallMask);
-                return hit.collider ? hit.distance : maxSightDistance;
+                RaycastHit2D hit = Physics2D.Raycast(Origin, Direction, maxSightDistance, wallMask);
+                if (hit.collider)
+                {
+                    HitPoint = hit.point;
+                    ReflectedHitDirection = Vector2.Reflect(Direction, hit.normal);
+                    return hit.distance;
+                }
+                else
+                {
+                    HitPoint = null;
+                    ReflectedHitDirection = null;
+                    return maxSightDistance;
+                }
             }
 
             void UpdateSight_NoCollider(float radius)
@@ -105,7 +127,6 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
                     float dist = Mathf.Sqrt(sqr);
                     if (Physics2D.Raycast(Origin, dir, dist, wallMask)) continue;
 
-                    // Tally
                     if (col.CompareTag("Player")) playerCount++;
                     else if (col.CompareTag("Enemy")) enemyCount++;
                 }
