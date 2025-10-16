@@ -16,20 +16,21 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] float word39_TurretTurnSpeedRadPerFrame = 0.08f;
         [SerializeField] int word40_TurretTargetTimer = 40;
 
-        private float fps = 3;
-        private float step;
+        private float AnglePerFrame => word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
+        private float fps = 15;
         private float desiredAngle;
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
         private bool isTurretPointingAtDesired = false;
 
         void Awake()
-        {
-            float anglePerFrame = word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
-            step = anglePerFrame * fps * Time.deltaTime;
+        {          
         }
 
         void Start()
         {
+            if (!turretPivot) Debug.LogError($"{name}: turretPivot not assigned");
+            if (!target) Debug.LogError($"{name}: target not assigned");
+            
             StartCoroutine(generateDesiredDirectionRoutine());
         }
 
@@ -40,10 +41,10 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         private void generateDesiredLookingDirection()
         {
-            Vector2 vectorFromTankToTarget = GeneralFunc.VectorFromOnePointToAnother(this.transform, target.transform);
+            Vector2 vectorFromTankToTarget = Utils.VectorFromOnePointToAnother(this.transform, target.transform);
             float randomOffsetAngle = Random.Range(-word29_TurretAngleOffset, word29_TurretAngleOffset);
-            Vector2 desiredTurretLookingDirection = GeneralFunc.RotateVector(vectorFromTankToTarget, randomOffsetAngle);
-            desiredAngle = GeneralFunc.VectorToAngle(desiredTurretLookingDirection) - 90;
+            Vector2 desiredTurretLookingDirection = Utils.RotateVector(vectorFromTankToTarget, randomOffsetAngle);
+            desiredAngle = Utils.VectorToAngle(desiredTurretLookingDirection) - 90;
             isTurretPointingAtDesired = false;
         }
 
@@ -51,10 +52,10 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         {
             if (isTurretPointingAtDesired)
                 return;
-            
-            float angleToRotateTo = Mathf.MoveTowardsAngle(CurrentLookingAngle, desiredAngle, step);
-            GeneralFunc.RotateTransform(ref turretPivot, angleToRotateTo);
 
+            float step = AnglePerFrame * fps * Time.deltaTime;
+            float angleToRotateTo = Mathf.MoveTowardsAngle(CurrentLookingAngle, desiredAngle, step);
+            Utils.RotateTransform(ref turretPivot, angleToRotateTo);
             isTurretPointingAtDesired = angleToRotateTo == desiredAngle;
         }
 

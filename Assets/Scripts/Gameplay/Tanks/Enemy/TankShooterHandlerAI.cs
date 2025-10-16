@@ -1,96 +1,111 @@
 ﻿using Assets.Scripts.Core;
-using System;
 using UnityEngine;
 
 namespace Assets.Scripts.Gameplay.Tanks.Enemy
 {
-    [RequireComponent(typeof(PolygonCollider2D))]
     public class TankShooterHandlerAI : EnemyAI
     {
-        [Header("Wedge")]
-        [SerializeField, Tooltip("Half-angle to each side, in degrees")]
-        float angle = 15f;
-        [SerializeField, Tooltip("Wedge reach in world units")]
-        float radius = 4f;
-        [SerializeField] LayerMask detectionMask;
+        [Header("Masks / Limits")]
+        //[SerializeField] LayerMask detectionMask;     // Player/Enemy layers
+        [SerializeField] LayerMask wallMask;          // Walls/Bricks that block sight & define radius
+        [SerializeField] float maxSightDistance = 40f; // used if no wall is hit straight ahead
 
-        private RaycastHit2D ray;
-        private PolygonCollider2D polygonCollider;
-        private Vector2 Origin { get => transform.position; }
-        private Vector2 Up { get => transform.up; }
-        private Vector2 Left { get => GeneralFunc.RotateVector(Up, angle); }
-        private Vector2 Right { get => GeneralFunc.RotateVector(Up, -angle); }
-        private int enemiesInSight = 0;
-
-        public bool EnemyInSight { get => enemiesInSight > 0; }
+        // Results
         public bool PlayerInSight { get; private set; } = false;
+        public bool EnemyInSight { get => enemiesInSight > 0; }
+        int enemiesInSight;
 
-        void Awake()
-        {
-            polygonCollider = GetComponent<PolygonCollider2D>();
-            polygonCollider.isTrigger = true;
-            polygonCollider.pathCount = 1;
-        }
+        // Reuse buffer to avoid GC
+        Collider2D[] _hits = new Collider2D[32];
+
+        // Geometry from this muzzle transform
+        Vector2 Origin => transform.position;
+        Vector2 Up => transform.up;
+        Vector2 Left => Utils.RotateVector(Up, AngleDeg);   // if you expose AngleDeg in EnemyAI, else compute below
+        Vector2 Right => Utils.RotateVector(Up, -AngleDeg);
+
+        // If your project doesn’t already expose the half-angle somewhere, keep one here:
+        [SerializeField] float AngleDeg = 15f;
 
         void OnValidate()
         {
-            if (angle < 0f) angle = 0f;
-            if (radius < 0f) radius = 0f;
-            if (polygonCollider == null) polygonCollider = GetComponent<PolygonCollider2D>();
-            if (polygonCollider != null) polygonCollider.isTrigger = true;
+            if (maxSightDistance < 0f) maxSightDistance = 0f;
+            if (AngleDeg < 0f) AngleDeg = 0f;
         }
 
-        void FixedUpdate()
+        void Update()
         {
-            updateWedgePolygon();
-        }
-        void OnTriggerEnter2D(Collider2D other)
-        {
-            handleTrigger(other, () => PlayerInSight = true, () => enemiesInSight++);
+            // 1) Get dynamic radius = nearest wall distance along Up (or cap)
+            float radius = RadiusToNearestWall();
+
+            // 2) Update sight flags using overlap + angular + LOS checks
+            UpdateSight_NoCollider(radius);
+
+#if UNITY_EDITOR
+            // visualize edges with current dynamic radius
+            Debug.DrawRay(Origin, Left.normalized * radius, Color.green);
+            Debug.DrawRay(Origin, Right.normalized * radius, Color.green);
+
+            // visualize straight-ahead ray used to compute radius
+            Debug.DrawRay(Origin, Up.normalized * radius, Color.yellow);
+#endif
         }
 
-        void OnTriggerExit2D(Collider2D other)
+        float RadiusToNearestWall()
         {
-            handleTrigger(other, () => PlayerInSight = false, () => enemiesInSight--);
+            // Correct signature: (origin, direction, distance, layerMask)
+            RaycastHit2D hit = Physics2D.Raycast(Origin, Up, wallMask);
+            return hit.collider ? hit.distance : maxSightDistance;
         }
 
-        private void handleTrigger(Collider2D other, Action ifPlayer, Action ifEnemy)
+        void UpdateSight_NoCollider(float radius)
         {
-            if (other)
+            _hits = Physics2D.OverlapCircleAll(Origin, radius);
+
+            bool sawPlayer = false;
+            int enemyCount = 0;
+
+            // If Left/Right are derived from AngleDeg as above, halfFov = AngleDeg.
+            // If you compute Left/Right elsewhere, keep this robust calc:
+            float halfFovDeg = AngleDeg; // or: HalfFovFromEdgesDeg(Left, Right)
+            Vector2 forward = Up.normalized;
+
+            foreach (var col in _hits)
             {
-                if (other.CompareTag("Player"))
-                    ifPlayer.Invoke();
-                else if (other.CompareTag("Enemy"))
-                    ifEnemy.Invoke();
+                if (!col) continue;
+               
+                Vector2 to = Utils.VectorFromOnePointToAnother(Origin, col.ClosestPoint(Origin));
+                float sqr = to.sqrMagnitude;
+                if (sqr < 1e-8f) continue;
+
+                Vector2 dir = to / Mathf.Sqrt(sqr);
+
+                // Angular gate: within ±halfFov around Up?
+                float signed = Vector2.SignedAngle(forward, dir);
+                if (Mathf.Abs(signed) > halfFovDeg + 0.0001f) continue;
+
+                // LOS gate: blocked by walls?
+                float dist = Mathf.Sqrt(sqr);
+                if (Physics2D.Raycast(Origin, dir, dist, wallMask)) continue;
+
+                // Tally
+                if (col.CompareTag("Player")) sawPlayer = true;
+                else if (col.CompareTag("Enemy")) enemyCount++;
             }
+
+            PlayerInSight = sawPlayer;
+            enemiesInSight = enemyCount;
+            Debug.Log($"{enemiesInSight}, {PlayerInSight}");
         }
 
-        private void updateWedgePolygon()
+        // If you ever need it (for asymmetric edges), use this instead of AngleDeg:
+        static float HalfFovFromEdgesDeg(Vector2 left, Vector2 right)
         {
-            if (!polygonCollider) return;
-
-            // Build triangle in WORLD space
-            Vector2 a = Origin + GeneralFunc.SetMagnitude(Left, radius);
-            Vector2 b = Origin + GeneralFunc.SetMagnitude(Right, radius);
-
-            // Convert to LOCAL space of the collider’s transform
-            var colliderTransform = polygonCollider.transform;
-            Vector2 oL = colliderTransform.InverseTransformPoint(Origin);
-            Vector2 aL = colliderTransform.InverseTransformPoint(a);
-            Vector2 bL = colliderTransform.InverseTransformPoint(b);
-
-            // If you use collider.offset, subtract it (keep polygon around offset)
-            if (polygonCollider.offset != Vector2.zero)
-            {
-                oL -= polygonCollider.offset;
-                aL -= polygonCollider.offset;
-                bL -= polygonCollider.offset;
-            }
-
-            // Order: origin -> left edge -> right edge (consistent winding)
-            // Choose ordering to match your chosen side; here we use +angle as "left"
-            var points = new Vector2[3] { oL, aL, bL };
-            polygonCollider.SetPath(0, points);
+            if (left == Vector2.zero || right == Vector2.zero) return 0f;
+            float aL = Mathf.Atan2(left.y, left.x) * Mathf.Rad2Deg;
+            float aR = Mathf.Atan2(right.y, right.x) * Mathf.Rad2Deg;
+            float span = Mathf.Abs(Mathf.DeltaAngle(aL, aR));
+            return 0.5f * span;
         }
     }
 }

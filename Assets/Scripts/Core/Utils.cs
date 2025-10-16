@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Core
 {
-    public static class GeneralFunc
+    public static class Utils
     {
         public static Vector2 AngleToVector(float angleDeg)
         {
@@ -40,7 +40,12 @@ namespace Assets.Scripts.Core
 
         public static Vector2 VectorFromOnePointToAnother(Transform from, Transform to)
         {
-            return to.position - from.position;
+            return VectorFromOnePointToAnother(from.position, to.position);
+        }
+
+        public static Vector2 VectorFromOnePointToAnother(Vector2 from, Vector2 to)
+        {
+            return to - from;
         }
 
         public static void RotateTransform(ref Transform toRotate, float angleToRotateBy)

@@ -374,12 +374,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27effcd01837c074495cacb088e77371, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  angle: 15
-  radius: 4
   detectionMask:
     serializedVersion: 2
     m_Bits: 0
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  maxSightDistance: 40
+  AngleDeg: 15
 --- !u!1 &6860890900981299683
 GameObject:
   m_ObjectHideFlags: 0

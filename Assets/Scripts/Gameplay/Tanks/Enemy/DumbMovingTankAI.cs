@@ -220,7 +220,7 @@ public class DumbestMovingTankAI : EnemyAI
             {
                 var entry = movementQueue.Dequeue();
                 lastQueueSource = entry.src;
-                turnTargetAngleDeg = GeneralFunc.ConvertToAngle(entry.angleDeg);
+                turnTargetAngleDeg = Utils.ConvertToAngle(entry.angleDeg);
             }
             else
                 lastQueueSource = QueueSource.None;
@@ -231,7 +231,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private void makeRandomDegreeMoreBiasTowardsPlayerPosition(ref float randomDelta)
     {
-        Vector2 initialDir = GeneralFunc.AngleToVector(getFacingAngleDeg() + randomDelta).normalized;
+        Vector2 initialDir = Utils.AngleToVector(getFacingAngleDeg() + randomDelta).normalized;
         Vector2 toPlayer = ((Vector2)(playerTarget.position - transform.position)).normalized;
         Vector2 mixed = Vector2.Lerp(initialDir, toPlayer, Mathf.Clamp01(word21_Aggressiveness)).normalized;
         float mixedDelta = Mathf.DeltaAngle(getAngleFromDir(initialDir), getAngleFromDir(mixed));
@@ -406,7 +406,7 @@ public class DumbestMovingTankAI : EnemyAI
     private void EnqueueMiniTurnsRelative(float deltaAngleDeg, QueueSource src)
     {
         float start = getFacingAngleDeg();
-        float target = GeneralFunc.ConvertToAngle(start + deltaAngleDeg);
+        float target = Utils.ConvertToAngle(start + deltaAngleDeg);
 
         movementQueue.Clear();
         lastQueueSource = src;
@@ -417,7 +417,7 @@ public class DumbestMovingTankAI : EnemyAI
         float accum = start;
         for (int i = 1; i <= count; i++)
         {
-            accum = GeneralFunc.ConvertToAngle(start + step * i);
+            accum = Utils.ConvertToAngle(start + step * i);
             movementQueue.Enqueue((accum, src));
         }
     }
@@ -429,7 +429,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private float getOppositeFacingAngleDeg()
     {
-        return GeneralFunc.ConvertToAngle(getFacingAngleDeg() + 180f);
+        return Utils.ConvertToAngle(getFacingAngleDeg() + 180f);
     }
 
     private void SetFacingAngleDeg(float angle)

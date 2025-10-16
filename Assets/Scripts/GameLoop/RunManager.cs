@@ -82,7 +82,7 @@ namespace Game.GameLoop
 
         private void LoadStage(int idx, bool firstTimeLoading)
         {
-            StopAllCoroutines();
+            //StopAllCoroutines();
 
             var currentStage = StageList[idx];
             currentStage.SetActive(true);
