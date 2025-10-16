@@ -226,7 +226,7 @@ public class DumbestMovingTankAI : EnemyAI
                 lastQueueSource = QueueSource.None;
             sequenceTurnFlag = false;
         }
-        printLog("movementQueue count: " + movementQueue.Count);
+        //printLog("movementQueue count: " + movementQueue.Count);
     }
 
     private void makeRandomDegreeMoreBiasTowardsPlayerPosition(ref float randomDelta)
