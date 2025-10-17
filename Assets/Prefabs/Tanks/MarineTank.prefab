@@ -194,7 +194,7 @@ MonoBehaviour:
   word20_SurvivalModeFlag: 1
   word21_Aggressiveness: 0
   word22_QueueCount: 4
-  word23_MaxSpeed: 0.019
+  word23_MaxSpeed: 0.02
   word26_TurnSpeedRadPerFrame: 0.18
   word27_MaxTurnPivotDeg: 10
   word28_ObstacleAwareness: 30

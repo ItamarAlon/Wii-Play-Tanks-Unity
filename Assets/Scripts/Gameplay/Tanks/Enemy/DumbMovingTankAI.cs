@@ -194,12 +194,12 @@ public class DumbestMovingTankAI : EnemyAI
 
     void Start()
     {
-        StartCoroutine(continuesMovementOpportunityRoutine());
+        StartCoroutine(movementOpportunityRoutine());
     }
 
     void Update()
     {
-        Debug.Log($"Queue Count: {movementQueue.Count}");
+        //Debug.Log($"Queue Count: {movementQueue.Count}");
         //StartCoroutine(movementOpportunityRoutine());
         //calculateNewTurn();
         RotateBodyTowardTurnTarget();
@@ -215,27 +215,21 @@ public class DumbestMovingTankAI : EnemyAI
 
     private IEnumerator movementOpportunityRoutine()
     {
-        int randomTimer = pickNewRandomTurningValue();
-        for (int i = 0; i < randomTimer; i++)
-            yield return null;
-        calculateNewTurn();
-    }
-
-    private IEnumerator continuesMovementOpportunityRoutine()
-    {
         while (true)
         {
             int randomTimer = pickNewRandomTurningValue();
             for (int i = 0; i < randomTimer; i++)
                 yield return null;
             calculateNewTurn();
+
+            Debug.DrawLine(transform.position, agent.destination);
         }
     }
 
     private void calculateNewTurn()
     {
         handleMovementOpportunityCadence();
-        turnTargetAngleDeg = generateAngleToMoveToBasedOnRequested();
+        turnTargetAngleDeg = generateAngleToTurnToBasedOnRequested();
     }
 
     // ───────────────────────── step 1: cadence ─────────────────────────
@@ -251,7 +245,7 @@ public class DumbestMovingTankAI : EnemyAI
     }
 
     // ───────────────────────── step 2: decide turn target ─────────────────────────
-    private float generateAngleToMoveToBasedOnRequested()
+    private float generateAngleToTurnToBasedOnRequested()
     {
         if (SurvivalTurnRequested)
         {
@@ -414,8 +408,9 @@ public class DumbestMovingTankAI : EnemyAI
 
         agent.speed = unitsPerSecond;
 
-        Vector3 shortAhead = transform.position + (Vector3)(dir2D);
+        Vector3 shortAhead = transform.position + (Vector3)(dir2D * getlookDistance());
         agent.SetDestination(shortAhead);
+        //agent.Move(shortAhead);
     }
 
     // ───────────────────────── utilities (unchanged logic) ─────────────────────────

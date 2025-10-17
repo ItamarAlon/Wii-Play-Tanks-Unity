@@ -143,7 +143,7 @@ MonoBehaviour:
   <MuzzleSpeed>k__BackingField: 3.76
   <MaxBounces>k__BackingField: 1
   cooldownSeconds: 0.25
-  maxActive: 4
+  maxActive: 1
   isPlayer: 0
 --- !u!195 &3743735772750004465
 NavMeshAgent:
@@ -183,7 +183,7 @@ MonoBehaviour:
   internalUnitsToUnity: 1
   simulationFps: 60
   word11_Accel: 0.3
-  word12_DecelMul: 0
+  word12_DecelMul: 0.6
   word13_RandomTurnMaxAngle: 90
   word14_TimerA: 90
   word15_TimerB: 150
@@ -193,7 +193,7 @@ MonoBehaviour:
   word19_PlayerBulletAwareness: 40
   word20_SurvivalModeFlag: 1
   word21_Aggressiveness: 0.08
-  word22_QueueCount: 7
+  word22_QueueCount: 4
   word23_MaxSpeed: 0.02
   word26_TurnSpeedRadPerFrame: 0.04
   word27_MaxTurnPivotDeg: 10
@@ -228,7 +228,7 @@ MonoBehaviour:
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
   word29_TurretAngleOffset: 40
-  word39_TurretTurnSpeedRadPerFrame: 0.01
+  word39_TurretTurnSpeedRadPerFrame: 0.03
   word40_TurretTargetTimer: 90
 --- !u!114 &6375145360895304136
 MonoBehaviour:
