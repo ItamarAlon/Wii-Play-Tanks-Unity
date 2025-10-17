@@ -158,7 +158,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
                 playersInSight = playerCount;
                 enemiesInSight = enemyCount;
-                Debug.Log($"{enemiesInSight}, {PlayerInSight}");
+                //Debug.Log($"{enemiesInSight}, {PlayerInSight}");
             }
         }        
     }

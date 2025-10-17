@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Assets.Scripts.Core;
+using Assets.Scripts.Gameplay.Tanks.Enemy;
+using NUnit.Framework.Internal;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.AI;
-using Assets.Scripts.Core;
-using Assets.Scripts.Gameplay.Tanks.Enemy;
 
 /// <summary>
 /// Wii Play Tanks - Dumbest Moving Tank (Movement-Only AI) – refactor only (behavior unchanged)
@@ -84,20 +87,78 @@ public class DumbestMovingTankAI : EnemyAI
     private int turningTimerFrames = 0;
     private int randomTurningValue;
 
-    private bool survivalModeFlag;
-    private bool largeTurnFlag;
-    private bool sequenceTurnFlag;
-    private bool randomTurnFlag;
-    private bool mineMovementOverrideFlag = false;
+    //private bool survivalModeFlag;
+    //private bool largeTurnFlag;
+    //private bool sequenceTurnFlag;
+    //private bool randomTurnFlag;
+    //private bool mineMovementOverrideFlag = false;
 
-    private enum QueueSource { None, RandomTurn, LargeTurn }
-    private readonly Queue<(float angleDeg, QueueSource src)> movementQueue = new();
-    private QueueSource lastQueueSource = QueueSource.None;
+    private class MovementQueue
+    {
+        private readonly Queue<float> movementQueue;
+        private readonly int capacity;
+        public enum QueueSource { None, RandomTurn, LargeTurn }
+        public QueueSource CurrentQueueSource { get; private set; } = QueueSource.None;
+        public bool Empty => movementQueue.Count == 0;
+        public float? NextAngle
+        {
+            get
+            {
+                if (Empty) 
+                    return null;
+                float returnValue = movementQueue.Dequeue();
+                if (Empty)
+                    CurrentQueueSource = QueueSource.None;
+                return returnValue;
+            }
+        }
+
+        public MovementQueue(int capacity)
+        {
+            this.capacity = Mathf.Max(1, capacity);
+            movementQueue = new Queue<float>(capacity);
+        }
+        public void ClearQueue() 
+        { 
+            movementQueue.Clear();
+            CurrentQueueSource = QueueSource.None;
+        }
+        public void EnqueueMiniTurnsRelative(float startingAngle, float deltaAngle, QueueSource src)
+        {
+            if (!CanEnterNewValues(src)) return;
+            ClearQueue();
+            CurrentQueueSource = src;
+            float step = deltaAngle / capacity;
+
+            float nextAngle;
+            for (int i = 1; i <= capacity; i++)
+            {
+                nextAngle = Utils.ConvertToAngle(startingAngle + step * i);
+                movementQueue.Enqueue(nextAngle);
+            }
+        }
+        public bool CanEnterNewValues(QueueSource src)
+        {
+            switch (CurrentQueueSource)
+            {
+                default:
+                case QueueSource.None: //if empty
+                    return true;
+                case QueueSource.LargeTurn:
+                    return false;
+                case QueueSource.RandomTurn:
+                    return src == QueueSource.LargeTurn;
+            }
+        }
+        public bool CanMakeLargeTurn() => CanEnterNewValues(QueueSource.LargeTurn);
+    }
+    private MovementQueue movementQueue;
 
     private float currentVelocity_InternalPerFrame = 0f;
     private float requestedSpeed_InternalPerFrame = 0f;
     private float turnTargetAngleDeg;
     private bool moveForwardThisFrame = true;
+    private Vector2 ForwardDirection => transform.up.normalized;
 
     [Header("Stun Timers (optional, set by shooter/mine systems)")]
     public int bulletStunTimerFrames = 0; // Word 42
@@ -110,132 +171,157 @@ public class DumbestMovingTankAI : EnemyAI
 
     void Awake()
     {
+        movementQueue = new MovementQueue(word22_QueueCount);
         if (agent == null) agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
 
         turnTargetAngleDeg = getFacingAngleDeg();
-        PickNewRandomTurningValue();
+        pickNewRandomTurningValue();
     }
 
     void Update()
     {
-        HandleMovementOpportunityCadence();
-        ProcessTurnTargetPriority();
+        StartCoroutine(movementOpportunityRoutine());
+        //calculateNewTurn();
         RotateBodyTowardTurnTarget();
         ComputeRequestedSpeed();
         ApplyAccelDecelAndStuns();
         MoveAgentAlongCurrentFacing();
     }
 
-    // ───────────────────────── step 1: cadence ─────────────────────────
-    private void HandleMovementOpportunityCadence()
-    {
-        if (turningTimerFrames >= randomTurningValue)
-        {
-            PickNewRandomTurningValue();
-            turningTimerFrames = 0;
+    private enum MoveRequest { Large, Survival, None};
+    private MoveRequest wantedMove = MoveRequest.None;
+    private bool SurvivalTurnRequested => wantedMove == MoveRequest.Survival;
+    private bool LargeTurnRequested => wantedMove == MoveRequest.Large;
 
-            if (word20_SurvivalModeFlag != 0 && DetectThreatsForSurvival())
-            {
-                survivalModeFlag = true;
-            }
-            else
-            {
-                if (IsThereObstacleAhead())
-                {
-                    largeTurnFlag = true;
-                }
-                else if (movementQueue.Count > 0)
-                {
-                    sequenceTurnFlag = true;
-                }
-                else
-                {
-                    randomTurnFlag = true;
-                }
-            }
-        }
-        turningTimerFrames++;
+    private IEnumerator movementOpportunityRoutine()
+    {
+        int randomTimer = pickNewRandomTurningValue();
+        for (int i = 0; i < randomTimer; i++)
+            yield return null;
+        calculateNewTurn();
+    }
+
+    private void calculateNewTurn()
+    {
+        handleMovementOpportunityCadence();
+        turnTargetAngleDeg = generateAngleToMoveToBasedOnRequested();
+    }
+
+    // ───────────────────────── step 1: cadence ─────────────────────────
+    private void handleMovementOpportunityCadence()
+    {
+        if (word20_SurvivalModeFlag != 0 && DetectThreatsForSurvival())
+            wantedMove = MoveRequest.Survival;
+        else if (IsThereObstacleAhead())
+            wantedMove = MoveRequest.Large;
+        else
+            wantedMove = MoveRequest.None;
     }
 
     // ───────────────────────── step 2: decide turn target ─────────────────────────
-    private void ProcessTurnTargetPriority()
+    private float generateAngleToMoveToBasedOnRequested()
     {
-        if (mineMovementOverrideFlag)
+        if (SurvivalTurnRequested)
         {
-            mineMovementOverrideFlag = false;
-            return;
+            movementQueue.ClearQueue();
+            return computeSurvivalEscapeAngle();
         }
+        if (LargeTurnRequested && movementQueue.CanMakeLargeTurn())
+            enterAnglesForLargeTurnToQueue();
+        else if (movementQueue.Empty)
+            enterAnglesForRandomTurnToQueue();
+        return movementQueue.NextAngle.Value;
+    }
+    //private void ProcessTurnTargetPriority()
+    //{
+    //    if (mineMovementOverrideFlag)
+    //    {
+    //        mineMovementOverrideFlag = false;
+    //        return;
+    //    }
+    //
+    //    if (survivalModeFlag)
+    //    {
+    //        turnTargetAngleDeg = computeSurvivalEscapeAngle();
+    //        survivalModeFlag = false;
+    //    }
+    //    else if (largeTurnFlag)
+    //    {
+    //        MovementQueue.QueueSource src = MovementQueue.QueueSource.LargeTurn;
+    //        if (movementQueue.CanEnterNewValues(src))
+    //        {
+    //            enterAnglesForLargeTurnToQueue();
+    //        }
+    //
+    //        largeTurnFlag = false;
+    //        sequenceTurnFlag = true; // consume next queued mini-turn
+    //    }
+    //    else if (randomTurnFlag)
+    //    {
+    //        MovementQueue.QueueSource src = MovementQueue.QueueSource.RandomTurn;
+    //        enterAnglesForRandomTurnToQueue();
+    //        randomTurnFlag = false;
+    //        sequenceTurnFlag = true;
+    //    }
+    //
+    //    if (sequenceTurnFlag)
+    //    {
+    //        turnTargetAngleDeg = movementQueue.NextAngle.Value;
+    //        sequenceTurnFlag = false;
+    //    }
+    //    //printLog("movementQueue count: " + movementQueue.Count);
+    //}
 
-        if (survivalModeFlag)
-        {
-            Vector2 away = ComputeSurvivalEscapeVector();
-            if (away.sqrMagnitude > 0.0001f)
-                turnTargetAngleDeg = arctanDeg(away.y, away.x);
-            survivalModeFlag = false;
-        }
-        else if (largeTurnFlag)
-        {
-            bool overwriteAllowed = (lastQueueSource != QueueSource.LargeTurn);
-            if (overwriteAllowed)
-            {
-                var (leftOpen, rightOpen) = ProbeLeftRightForLargeTurn_NavMesh(getlookDistance());
-
-                if (leftOpen || rightOpen)
-                {
-                    float chosenDelta = (leftOpen && rightOpen)
-                        ? (Random.value < 0.5f ? +90f : -90f)
-                        : (leftOpen ? +90f : -90f);
-                    EnqueueMiniTurnsRelative(chosenDelta, QueueSource.LargeTurn);
-                }
-                else
-                {
-                    turnTargetAngleDeg = getOppositeFacingAngleDeg();
-                    movementQueue.Clear();
-                    lastQueueSource = QueueSource.None;
-                }
-            }
-
-            largeTurnFlag = false;
-            sequenceTurnFlag = true; // consume next queued mini-turn
-        }
-        else if (randomTurnFlag)
-        {
-            float randomDelta = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
-
-            if (playerTarget != null && word21_Aggressiveness > 0f)
-            {
-                makeRandomDegreeMoreBiasTowardsPlayerPosition(ref randomDelta);
-            }
-
-            EnqueueMiniTurnsRelative(randomDelta, QueueSource.RandomTurn);
-            randomTurnFlag = false;
-            sequenceTurnFlag = true;
-        }
-
-        if (sequenceTurnFlag)
-        {
-            if (movementQueue.Count > 0)
-            {
-                var entry = movementQueue.Dequeue();
-                lastQueueSource = entry.src;
-                turnTargetAngleDeg = Utils.ConvertToAngle(entry.angleDeg);
-            }
-            else
-                lastQueueSource = QueueSource.None;
-            sequenceTurnFlag = false;
-        }
-        //printLog("movementQueue count: " + movementQueue.Count);
+    private float computeSurvivalEscapeAngle()
+    {
+        Vector2 away = ComputeSurvivalEscapeVector();
+        //if (away.sqrMagnitude > 0.0001f)
+        //    return arctanDeg(away.y, away.x);
+        return arctanDeg(away.y, away.x);
     }
 
-    private void makeRandomDegreeMoreBiasTowardsPlayerPosition(ref float randomDelta)
+    private void enterAnglesForRandomTurnToQueue()
     {
-        Vector2 initialDir = Utils.AngleToVector(getFacingAngleDeg() + randomDelta).normalized;
-        Vector2 toPlayer = ((Vector2)(playerTarget.position - transform.position)).normalized;
-        Vector2 mixed = Vector2.Lerp(initialDir, toPlayer, Mathf.Clamp01(word21_Aggressiveness)).normalized;
-        float mixedDelta = Mathf.DeltaAngle(getAngleFromDir(initialDir), getAngleFromDir(mixed));
-        randomDelta += mixedDelta;
+        float randomTurnAngle = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
+
+        if (playerTarget && word21_Aggressiveness > 0f)
+            makeRandomAngleMoreBiasTowardsPlayerPosition(ref randomTurnAngle);
+
+        enqueueMiniTurnsRelative(randomTurnAngle, MovementQueue.QueueSource.RandomTurn);
+    }
+
+    private void enterAnglesForLargeTurnToQueue()
+    {
+        var (leftOpen, rightOpen) = ProbeLeftRightForLargeTurn_NavMesh(getlookDistance());
+
+        if (leftOpen || rightOpen)
+        {
+            float chosenDelta = (leftOpen && rightOpen)
+                ? (Random.value < 0.5f ? +90f : -90f)
+                : (leftOpen ? +90f : -90f);
+            enqueueMiniTurnsRelative(chosenDelta, MovementQueue.QueueSource.LargeTurn);
+        }
+        else
+        {
+            turnTargetAngleDeg = getOppositeFacingAngleDeg();
+            movementQueue.ClearQueue();
+        }
+    }
+
+    private void enqueueMiniTurnsRelative(float chosenDelta, MovementQueue.QueueSource src)
+    {
+        movementQueue.EnqueueMiniTurnsRelative(getFacingAngleDeg(), chosenDelta, src);
+    }
+
+    private void makeRandomAngleMoreBiasTowardsPlayerPosition(ref float randomAngle)
+    {
+        Vector2 randomDirectionVector = Utils.RotateVector(ForwardDirection, randomAngle).normalized;
+        Vector2 toPlayer = Utils.VectorFromOnePointToAnother(transform, playerTarget);
+        Vector2 aggressivenessBiasVector = Utils.SetMagnitude(toPlayer, word21_Aggressiveness);
+        Vector2 adjustedDirectionVector = randomDirectionVector + aggressivenessBiasVector;
+        randomAngle = Utils.VectorToAngle(adjustedDirectionVector.normalized);
     }
 
     // ───────────────────────── step 3: rotate body ─────────────────────────
@@ -299,18 +385,17 @@ public class DumbestMovingTankAI : EnemyAI
 
     // ───────────────────────── utilities (unchanged logic) ─────────────────────────
 
-    private void PickNewRandomTurningValue()
+    private int pickNewRandomTurningValue()
     {
         int a = word14_TimerA;
         int b = word15_TimerB;
         if (a == b)
         {
-            randomTurningValue = a;
-            return;
+            return a;
         }
         int min = Mathf.Min(a, b);
         int max = Mathf.Max(a, b) + 1; // exclusive
-        randomTurningValue = Random.Range(min, max);
+        return Random.Range(min, max);
     }
 
     private bool DetectThreatsForSurvival()
@@ -403,25 +488,6 @@ public class DumbestMovingTankAI : EnemyAI
     static Vector2 Rotate90(Vector2 v, int leftPlusOneRightMinusOne) =>
         leftPlusOneRightMinusOne >= 0 ? new Vector2(-v.y, v.x) : new Vector2(v.y, -v.x);
 
-    private void EnqueueMiniTurnsRelative(float deltaAngleDeg, QueueSource src)
-    {
-        float start = getFacingAngleDeg();
-        float target = Utils.ConvertToAngle(start + deltaAngleDeg);
-
-        movementQueue.Clear();
-        lastQueueSource = src;
-
-        int count = Mathf.Max(1, word22_QueueCount);
-        float step = Mathf.DeltaAngle(start, target) / count;
-
-        float accum = start;
-        for (int i = 1; i <= count; i++)
-        {
-            accum = Utils.ConvertToAngle(start + step * i);
-            movementQueue.Enqueue((accum, src));
-        }
-    }
-
     private float getFacingAngleDeg()
     {
         return arctanDeg(transform.up.y, transform.up.x);
@@ -459,7 +525,6 @@ public class DumbestMovingTankAI : EnemyAI
     }
 
     // Public hooks (unchanged)
-    public void NotifyMineMovementOverride() => mineMovementOverrideFlag = true;
+    //public void NotifyMineMovementOverride() => mineMovementOverrideFlag = true;
     public void ForceMovementOpportunityNextFrame() => turningTimerFrames = Mathf.Max(turningTimerFrames, randomTurningValue);
-    public void ClearQueue() { movementQueue.Clear(); lastQueueSource = QueueSource.None; }
 }

@@ -167,12 +167,12 @@ MonoBehaviour:
   startingLives: 3
   previewTimeSeconds: 3
   StageList:
-  - {fileID: 142212717}
-  - {fileID: 1386038922}
   - {fileID: 1333321127}
   - {fileID: 1762493269}
   - {fileID: 912120337}
   - {fileID: 1420376634}
+  - {fileID: 142212717}
+  - {fileID: 1386038922}
   levelLoader: {fileID: 1932649226}
   hud: {fileID: 642477475}
   stageManager: {fileID: 2876292}
