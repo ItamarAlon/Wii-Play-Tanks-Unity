@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 3743735772750004465}
+  hull: {fileID: 4542270977892972629}
   internalUnitsToUnity: 1
   simulationFps: 60
   word11_Accel: 0.3

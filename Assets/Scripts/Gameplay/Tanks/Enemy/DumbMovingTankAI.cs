@@ -17,6 +17,7 @@ public class DumbestMovingTankAI : EnemyAI
     [Header("NavMesh / 2D Setup")]
     [Tooltip("Assign your NavMeshAgent (NavMeshPlus 2D: set updateRotation=false, updateUpAxis=false).")]
     public NavMeshAgent agent;
+    public Transform hull;
 
     [Tooltip("Units: internal-units → Unity units scale. (PDF uses internal units; a block = 35.0 units).")]
     public float internalUnitsToUnity = 1f;
@@ -170,7 +171,7 @@ public class DumbestMovingTankAI : EnemyAI
     private float requestedSpeed_InternalPerFrame = 0f;
     private float turnTargetAngleDeg;
     private bool moveForwardThisFrame = true;
-    private Vector2 ForwardDirection => transform.up.normalized;
+    private Vector2 ForwardDirection => hull.up.normalized;
 
     [Header("Stun Timers (optional, set by shooter/mine systems)")]
     public int bulletStunTimerFrames = 0; // Word 42
@@ -222,7 +223,7 @@ public class DumbestMovingTankAI : EnemyAI
                 yield return null;
             calculateNewTurn();
 
-            Debug.DrawLine(transform.position, agent.destination);
+            Debug.DrawLine(hull.position, agent.destination);
         }
     }
 
@@ -347,7 +348,7 @@ public class DumbestMovingTankAI : EnemyAI
     private void makeRandomAngleMoreBiasTowardsPlayerPosition(ref float randomAngle)
     {
         Vector2 randomDirectionVector = Utils.RotateVector(ForwardDirection, randomAngle).normalized;
-        Vector2 toPlayer = Utils.VectorFromOnePointToAnother(transform, playerTarget);
+        Vector2 toPlayer = Utils.VectorFromOnePointToAnother(hull, playerTarget);
         Vector2 aggressivenessBiasVector = Utils.SetMagnitude(toPlayer, word21_Aggressiveness);
         Vector2 adjustedDirectionVector = randomDirectionVector + aggressivenessBiasVector;
         randomAngle = Utils.VectorToAngle(adjustedDirectionVector.normalized);
@@ -403,12 +404,12 @@ public class DumbestMovingTankAI : EnemyAI
     // ───────────────────────── step 6: move ─────────────────────────
     private void MoveAgentAlongCurrentFacing()
     {
-        Vector2 dir2D = transform.up * (moveForwardThisFrame ? 1f : -1f);
+        Vector2 dir2D = hull.up * (moveForwardThisFrame ? 1f : -1f);
         float unitsPerSecond = currentVelocity_InternalPerFrame * simulationFps * internalUnitsToUnity;
 
         agent.speed = unitsPerSecond;
 
-        Vector3 shortAhead = transform.position + (Vector3)(dir2D * getlookDistance());
+        Vector3 shortAhead = hull.position + (Vector3)(dir2D * getlookDistance());
         agent.SetDestination(shortAhead);
         //agent.Move(shortAhead);
     }
@@ -430,9 +431,9 @@ public class DumbestMovingTankAI : EnemyAI
 
     private bool DetectThreatsForSurvival()
     {
-        bool aiMine = word16_AIMineAwareness > 0f && Physics2D.OverlapCircle(transform.position, word16_AIMineAwareness * internalUnitsToUnity, aiMineMask);
+        bool aiMine = word16_AIMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, word16_AIMineAwareness * internalUnitsToUnity, aiMineMask);
         bool aiBullet = word17_AIBulletAwareness > 0f && AnyBulletHeadingTowardsMe(aiBulletMask, word17_AIBulletAwareness, "Enemy");
-        bool playerMine = word18_PlayerMineAwareness > 0f && Physics2D.OverlapCircle(transform.position, word18_PlayerMineAwareness * internalUnitsToUnity, playerMineMask);
+        bool playerMine = word18_PlayerMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, word18_PlayerMineAwareness * internalUnitsToUnity, playerMineMask);
         bool playerBullet = word19_PlayerBulletAwareness > 0f && AnyBulletHeadingTowardsMe(playerBulletMask, word19_PlayerBulletAwareness, "Player");
         return aiMine || aiBullet || playerMine || playerBullet;
     }
@@ -451,13 +452,13 @@ public class DumbestMovingTankAI : EnemyAI
     {
         if (radiusInternal <= 0f) return;
         float r = radiusInternal * internalUnitsToUnity;
-        var hits = Physics2D.OverlapCircleAll(transform.position, r, mask);
+        var hits = Physics2D.OverlapCircleAll(hull.position, r, mask);
         foreach (var h in hits)
         {
             if (!h.CompareTag(tag)) 
                 continue;
 
-            Vector2 to = (Vector2)(h.transform.position - transform.position);
+            Vector2 to = (Vector2)(h.transform.position - hull.position);
             if (onlyTowardMe)
             {
                 var rb = h.attachedRigidbody;
@@ -474,13 +475,13 @@ public class DumbestMovingTankAI : EnemyAI
     private bool AnyBulletHeadingTowardsMe(LayerMask mask, float radiusInternal, string tag)
     {
         float r = radiusInternal * internalUnitsToUnity;
-        var hits = Physics2D.OverlapCircleAll(transform.position, r, mask);
+        var hits = Physics2D.OverlapCircleAll(hull.position, r, mask);
         foreach (var h in hits)
         {
             if (!h.CompareTag(tag)) continue;
             var rb = h.attachedRigidbody;
             if (rb == null) return true;
-            Vector2 to = (Vector2)(transform.position - h.transform.position);
+            Vector2 to = (Vector2)(hull.position - h.transform.position);
             if (to.sqrMagnitude < 0.0001f) return true;
             float dot = Vector2.Dot(rb.linearVelocity.normalized, to.normalized);
             if (dot > 0f) return true;
@@ -497,8 +498,8 @@ public class DumbestMovingTankAI : EnemyAI
 
     bool IsThereObstacleAhead(float lookingDistance)
     {
-        Vector3 start = transform.position;
-        Vector3 end = start + transform.up * lookingDistance;
+        Vector3 start = hull.position;
+        Vector3 end = start + hull.up * lookingDistance;
         return agent.Raycast(end, out _);
     }
 
@@ -509,9 +510,9 @@ public class DumbestMovingTankAI : EnemyAI
 
     (bool leftOpen, bool rightOpen) ProbeLeftRightForLargeTurn_NavMesh(float distanceUnity)
     {
-        Vector3 start = transform.position;
-        Vector3 leftEnd = start + (Vector3)Rotate90(transform.up, +1) * distanceUnity;
-        Vector3 rightEnd = start + (Vector3)Rotate90(transform.up, -1) * distanceUnity;
+        Vector3 start = hull.position;
+        Vector3 leftEnd = start + (Vector3)Rotate90(hull.up, +1) * distanceUnity;
+        Vector3 rightEnd = start + (Vector3)Rotate90(hull.up, -1) * distanceUnity;
 
         bool leftBlocked = agent.Raycast(leftEnd, out _);
         bool rightBlocked = agent.Raycast(rightEnd, out _);
@@ -524,7 +525,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private float getFacingAngleDeg()
     {
-        return arctanDeg(transform.up.y, transform.up.x);
+        return arctanDeg(hull.up.y, hull.up.x);
     }
 
     private float getOppositeFacingAngleDeg()
@@ -536,7 +537,7 @@ public class DumbestMovingTankAI : EnemyAI
     {
         float rad = angle * Mathf.Deg2Rad;
         Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
-        transform.up = dir.normalized;
+        hull.up = dir.normalized;
     }
 
     private static float arctanDeg(float y, float x)
