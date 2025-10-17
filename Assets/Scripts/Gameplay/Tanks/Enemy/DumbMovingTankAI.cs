@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Core;
 using Assets.Scripts.Gameplay.Tanks.Enemy;
 using NUnit.Framework.Internal;
+using PlasticPipe.PlasticProtocol.Messages;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Search;
@@ -100,16 +101,14 @@ public class DumbestMovingTankAI : EnemyAI
         public enum QueueSource { None, RandomTurn, LargeTurn }
         public QueueSource CurrentQueueSource { get; private set; } = QueueSource.None;
         public bool Empty => movementQueue.Count == 0;
-        public float? NextAngle
+        public int Count => movementQueue.Count;
+        public float NextAngle
         {
             get
             {
-                if (Empty) 
-                    return null;
-                float returnValue = movementQueue.Dequeue();
-                if (Empty)
+                if (movementQueue.Count == 1)
                     CurrentQueueSource = QueueSource.None;
-                return returnValue;
+                return movementQueue.Dequeue();
             }
         }
 
@@ -125,10 +124,23 @@ public class DumbestMovingTankAI : EnemyAI
         }
         public void EnqueueMiniTurnsRelative(float startingAngle, float deltaAngle, QueueSource src)
         {
+            //if (!CanEnterNewValues(src)) return;
+            //ClearQueue();
+            //CurrentQueueSource = src;
+            //float step = deltaAngle / capacity;
+
+            //float nextAngle;
+            //for (int i = 1; i <= capacity; i++)
+            //{
+            //    nextAngle = Utils.ConvertToAngle(startingAngle + step * i);
+            //    movementQueue.Enqueue(nextAngle);
+            //}
+
             if (!CanEnterNewValues(src)) return;
             ClearQueue();
             CurrentQueueSource = src;
-            float step = deltaAngle / capacity;
+            float target = Utils.ConvertToAngle(startingAngle + deltaAngle);
+            float step = Mathf.DeltaAngle(startingAngle, target) / capacity;
 
             float nextAngle;
             for (int i = 1; i <= capacity; i++)
@@ -187,6 +199,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     void Update()
     {
+        Debug.Log($"Queue Count: {movementQueue.Count}");
         //StartCoroutine(movementOpportunityRoutine());
         //calculateNewTurn();
         RotateBodyTowardTurnTarget();
@@ -234,7 +247,7 @@ public class DumbestMovingTankAI : EnemyAI
             wantedMove = MoveRequest.Large;
         else
             wantedMove = MoveRequest.None;
-        Debug.Log(wantedMove);
+        //Debug.Log(wantedMove);
     }
 
     // ───────────────────────── step 2: decide turn target ─────────────────────────
@@ -242,17 +255,17 @@ public class DumbestMovingTankAI : EnemyAI
     {
         if (SurvivalTurnRequested)
         {
-            //Debug.Log("Survival");
+            Debug.Log("Survival");
             movementQueue.ClearQueue();
             return computeSurvivalEscapeAngle();
         }
         if (LargeTurnRequested && movementQueue.CanMakeLargeTurn())
             enterAnglesForLargeTurnToQueue();
-        else if (movementQueue.Empty)
+        while (movementQueue.Empty)
             enterAnglesForRandomTurnToQueue();
 
         wantedMove = MoveRequest.None;
-        return movementQueue.NextAngle.Value;
+        return movementQueue.NextAngle;
     }
     //private void ProcessTurnTargetPriority()
     //{

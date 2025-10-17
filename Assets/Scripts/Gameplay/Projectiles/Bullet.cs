@@ -4,7 +4,6 @@
 
 using UnityEngine;
 using Game.Gameplay.Tanks.Shared;
-using UnityEngine.Tilemaps;
 
 namespace Game.Gameplay.Projectiles
 {

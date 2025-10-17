@@ -17,7 +17,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] int word40_TurretTargetTimer = 40;
 
         private float AnglePerFrame => word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
-        private float fps = 15;
+        private float fps = 25;
         private float desiredAngle;
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
         private bool isTurretPointingAtDesired = false;
