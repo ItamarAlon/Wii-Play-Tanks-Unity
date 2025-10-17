@@ -180,9 +180,14 @@ public class DumbestMovingTankAI : EnemyAI
         pickNewRandomTurningValue();
     }
 
+    void Start()
+    {
+        StartCoroutine(continuesMovementOpportunityRoutine());
+    }
+
     void Update()
     {
-        StartCoroutine(movementOpportunityRoutine());
+        //StartCoroutine(movementOpportunityRoutine());
         //calculateNewTurn();
         RotateBodyTowardTurnTarget();
         ComputeRequestedSpeed();
@@ -203,6 +208,17 @@ public class DumbestMovingTankAI : EnemyAI
         calculateNewTurn();
     }
 
+    private IEnumerator continuesMovementOpportunityRoutine()
+    {
+        while (true)
+        {
+            int randomTimer = pickNewRandomTurningValue();
+            for (int i = 0; i < randomTimer; i++)
+                yield return null;
+            calculateNewTurn();
+        }
+    }
+
     private void calculateNewTurn()
     {
         handleMovementOpportunityCadence();
@@ -218,6 +234,7 @@ public class DumbestMovingTankAI : EnemyAI
             wantedMove = MoveRequest.Large;
         else
             wantedMove = MoveRequest.None;
+        Debug.Log(wantedMove);
     }
 
     // ───────────────────────── step 2: decide turn target ─────────────────────────
@@ -225,6 +242,7 @@ public class DumbestMovingTankAI : EnemyAI
     {
         if (SurvivalTurnRequested)
         {
+            //Debug.Log("Survival");
             movementQueue.ClearQueue();
             return computeSurvivalEscapeAngle();
         }
@@ -232,6 +250,8 @@ public class DumbestMovingTankAI : EnemyAI
             enterAnglesForLargeTurnToQueue();
         else if (movementQueue.Empty)
             enterAnglesForRandomTurnToQueue();
+
+        wantedMove = MoveRequest.None;
         return movementQueue.NextAngle.Value;
     }
     //private void ProcessTurnTargetPriority()
@@ -284,6 +304,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private void enterAnglesForRandomTurnToQueue()
     {
+        Debug.Log("Random");
         float randomTurnAngle = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
 
         if (playerTarget && word21_Aggressiveness > 0f)
@@ -294,6 +315,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private void enterAnglesForLargeTurnToQueue()
     {
+        Debug.Log("Large");
         var (leftOpen, rightOpen) = ProbeLeftRightForLargeTurn_NavMesh(getlookDistance());
 
         if (leftOpen || rightOpen)
@@ -401,29 +423,32 @@ public class DumbestMovingTankAI : EnemyAI
     private bool DetectThreatsForSurvival()
     {
         bool aiMine = word16_AIMineAwareness > 0f && Physics2D.OverlapCircle(transform.position, word16_AIMineAwareness * internalUnitsToUnity, aiMineMask);
-        bool aiBullet = word17_AIBulletAwareness > 0f && AnyBulletHeadingTowardsMe(aiBulletMask, word17_AIBulletAwareness);
+        bool aiBullet = word17_AIBulletAwareness > 0f && AnyBulletHeadingTowardsMe(aiBulletMask, word17_AIBulletAwareness, "Enemy");
         bool playerMine = word18_PlayerMineAwareness > 0f && Physics2D.OverlapCircle(transform.position, word18_PlayerMineAwareness * internalUnitsToUnity, playerMineMask);
-        bool playerBullet = word19_PlayerBulletAwareness > 0f && AnyBulletHeadingTowardsMe(playerBulletMask, word19_PlayerBulletAwareness);
+        bool playerBullet = word19_PlayerBulletAwareness > 0f && AnyBulletHeadingTowardsMe(playerBulletMask, word19_PlayerBulletAwareness, "Player");
         return aiMine || aiBullet || playerMine || playerBullet;
     }
 
     private Vector2 ComputeSurvivalEscapeVector()
     {
         Vector2 sum = Vector2.zero;
-        AccumulateInverseVectors(aiMineMask, word16_AIMineAwareness, ref sum);
-        AccumulateInverseVectors(playerMineMask, word18_PlayerMineAwareness, ref sum);
-        AccumulateInverseVectors(aiBulletMask, word17_AIBulletAwareness, ref sum, onlyTowardMe: true);
-        AccumulateInverseVectors(playerBulletMask, word19_PlayerBulletAwareness, ref sum, onlyTowardMe: true);
+        AccumulateInverseVectors(aiMineMask, "Enemy", word16_AIMineAwareness, ref sum);
+        AccumulateInverseVectors(playerMineMask, "Player", word18_PlayerMineAwareness, ref sum);
+        AccumulateInverseVectors(aiBulletMask, "Enemy", word17_AIBulletAwareness, ref sum, onlyTowardMe: true);
+        AccumulateInverseVectors(playerBulletMask, "Player", word19_PlayerBulletAwareness, ref sum, onlyTowardMe: true);
         return sum.normalized;
     }
 
-    private void AccumulateInverseVectors(LayerMask mask, float radiusInternal, ref Vector2 sum, bool onlyTowardMe = false)
+    private void AccumulateInverseVectors(LayerMask mask, string tag, float radiusInternal, ref Vector2 sum, bool onlyTowardMe = false)
     {
         if (radiusInternal <= 0f) return;
         float r = radiusInternal * internalUnitsToUnity;
         var hits = Physics2D.OverlapCircleAll(transform.position, r, mask);
         foreach (var h in hits)
         {
+            if (!h.CompareTag(tag)) 
+                continue;
+
             Vector2 to = (Vector2)(h.transform.position - transform.position);
             if (onlyTowardMe)
             {
@@ -438,12 +463,13 @@ public class DumbestMovingTankAI : EnemyAI
         }
     }
 
-    private bool AnyBulletHeadingTowardsMe(LayerMask mask, float radiusInternal)
+    private bool AnyBulletHeadingTowardsMe(LayerMask mask, float radiusInternal, string tag)
     {
         float r = radiusInternal * internalUnitsToUnity;
         var hits = Physics2D.OverlapCircleAll(transform.position, r, mask);
         foreach (var h in hits)
         {
+            if (!h.CompareTag(tag)) continue;
             var rb = h.attachedRigidbody;
             if (rb == null) return true;
             Vector2 to = (Vector2)(transform.position - h.transform.position);

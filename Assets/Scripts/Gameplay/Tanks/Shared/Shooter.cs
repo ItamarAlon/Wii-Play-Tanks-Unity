@@ -96,6 +96,7 @@ namespace Game.Gameplay.Tanks.Shared
         private Bullet createBullet()
         {
             Bullet bullet = Instantiate(BulletPrefab, Muzzle.position, Quaternion.identity);
+            bullet.tag = isPlayer ? "Player" : "Enemy";
             bullet.SetOwner(this);
             return bullet;
         }

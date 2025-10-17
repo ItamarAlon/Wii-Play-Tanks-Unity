@@ -44,7 +44,6 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
             checkShootingOpportunity();
 
-            Debug.Log(PlayerInSight);
             foreach (var beam in beams)
                 drawBeamDebug(beam);
         }
