@@ -2,6 +2,7 @@
 // Generated: 2025-10-03T10:21:31.691001
 // You can safely replace any class body with the real implementation from the HTML guide.
 
+using Assets.Scripts.Core;
 using UnityEngine;
 
 namespace Game.Gameplay.Tanks.Shared
@@ -15,14 +16,20 @@ namespace Game.Gameplay.Tanks.Shared
 
         void Awake()
         {
-            if (!worldCamera) worldCamera = Camera.main;
+            if (!worldCamera) 
+                worldCamera = Camera.main;
         }
 
         void Update()
         {
-            Vector3 w = worldCamera.ScreenToWorldPoint(Input.mousePosition);
-            w.z = transform.position.z;
-            Vector2 dir = (w - transform.position);
+            aimTurretTowardsMousePointer();
+        }
+
+        private void aimTurretTowardsMousePointer()
+        {
+            Vector3 mousePosition = worldCamera.ScreenToWorldPoint(Input.mousePosition);
+            mousePosition.z = transform.position.z;
+            Vector2 dir = Utils.VectorFromOnePointToAnother(transform.position, mousePosition);
 
             if (spriteFaces == AimAxis.Right)
                 transform.right = dir;

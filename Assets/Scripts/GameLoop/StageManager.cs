@@ -75,26 +75,40 @@ namespace Game.GameLoop
             }
         }
 
-        public void SetGameplayEnabled(bool enabled)
+        public void SetGameplayEnabled(bool enabled, bool affectTurretAimer = false)
         {
-            if (levelLoader.PlayerInstance)
-            {
-                var playerTank = levelLoader.PlayerInstance.GetComponent<PlayerTankController>();
-                if (playerTank) 
-                    playerTank.enabled = enabled;
-            }
+            enablePlayerGameplay(enabled, affectTurretAimer);
+            enableEnemyGameplay(enabled);
+        }
+
+        private void enableEnemyGameplay(bool enabled)
+        {
             foreach (var enemyTank in levelLoader.EnemyInstances)
             {
-                if (!enemyTank) 
+                if (!enemyTank)
                     continue;
 
                 EnemyAI[] aiScripts = enemyTank.GetComponents<EnemyAI>();
-                //NavMeshAgent agent = enemyTank.GetComponent<NavMeshAgent>();
 
                 foreach (var script in aiScripts)
                     script.Enable = enabled;
-                //if (agent) 
-                //    agent.enabled = enabled;
+            }
+        }
+
+        private void enablePlayerGameplay(bool enabled, bool affectTurretAimer)
+        {
+            GameObject player = levelLoader.PlayerInstance;
+            if (!player) return;
+
+            var playerTank = player.GetComponent<PlayerTankController>();
+            if (playerTank)
+                playerTank.enabled = enabled;
+
+            if (affectTurretAimer)
+            {
+                var turretAimer = player.GetComponentInChildren<TurretAimer>();
+                if (turretAimer)
+                    turretAimer.enabled = enabled;
             }
         }
     }

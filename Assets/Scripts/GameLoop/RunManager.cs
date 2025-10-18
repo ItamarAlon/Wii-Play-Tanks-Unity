@@ -32,7 +32,7 @@ namespace Game.GameLoop
         private void PauseMenu_Toggled(object sender, System.EventArgs e)
         {
             bool wasPaused = e as EventArgs<bool>;
-            stageManager.SetGameplayEnabled(!wasPaused);
+            stageManager.SetGameplayEnabled(!wasPaused, true);
         }
 
         void Start()
