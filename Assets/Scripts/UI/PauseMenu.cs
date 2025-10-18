@@ -1,7 +1,5 @@
-// Auto-generated stubs for Wii Play Tanks
-// Generated: 2025-10-03T10:21:31.691001
-// You can safely replace any class body with the real implementation from the HTML guide.
-
+using System;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,19 +7,23 @@ namespace Game.UI
 {
     public class PauseMenu : MonoBehaviour
     {
-        public GameObject panel;
-        private bool _paused;
+        [SerializeField] GameObject panel;
+        private bool paused;
+        public event EventHandler Toggled;
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape)) Toggle();
+            if (Input.GetKeyDown(KeyCode.Escape)) 
+                Toggle();
         }
 
         public void Toggle()
         {
-            _paused = !_paused;
-            if (panel) panel.SetActive(_paused);
-            Time.timeScale = _paused ? 0f : 1f;
+            paused = !paused;
+            if (panel) 
+                panel.SetActive(paused);
+            Time.timeScale = paused ? 0f : 1f;
+            OnToggled(paused);
         }
 
         public void OnResume() => Toggle();
@@ -29,6 +31,11 @@ namespace Game.UI
         {
             Time.timeScale = 1f;
             SceneManager.LoadScene("Title");
+        }
+
+        protected virtual void OnToggled(EventArgs<bool> e)
+        {
+            Toggled?.Invoke(this, e);
         }
     }
 }

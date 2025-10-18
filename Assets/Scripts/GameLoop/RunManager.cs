@@ -1,7 +1,3 @@
-// Auto-generated stubs for Wii Play Tanks
-// Generated: 2025-10-03T10:21:31.691001
-// You can safely replace any class body with the real implementation from the HTML guide.
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.Gameplay.Level;
@@ -14,6 +10,12 @@ namespace Game.GameLoop
     {
         [SerializeField] private int startingLives = 3;
         [SerializeField] private float previewTimeSeconds = 3f;
+        [SerializeField] GameObject[] StageList;
+        //public LevelLoader levelLoader;
+        [SerializeField] HUDController hud;
+        [SerializeField] StageManager stageManager;
+        [SerializeField] StageBanner banner;
+        [SerializeField] PauseMenu pauseMenu;
 
         public int CurrentLives { get; private set; }
         public int TotalKills { get; private set; }
@@ -22,11 +24,16 @@ namespace Game.GameLoop
         private int CurrentStageNum { get => CurrentStageIndex + 1; }
         private bool inStagePreview = false;
 
-        public GameObject[] StageList;
-        public LevelLoader levelLoader;
-        public HUDController hud;
-        public StageManager stageManager;
-        public StageBanner banner;
+        void Awake()
+        {
+            pauseMenu.Toggled += PauseMenu_Toggled;
+        }
+
+        private void PauseMenu_Toggled(object sender, System.EventArgs e)
+        {
+            bool wasPaused = e as EventArgs<bool>;
+            stageManager.SetGameplayEnabled(!wasPaused);
+        }
 
         void Start()
         {

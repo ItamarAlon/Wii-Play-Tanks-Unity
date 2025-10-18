@@ -99,65 +99,6 @@ public class TankMovementAI : EnemyAI
     // === Internal state (unchanged) ===
     private bool allowedRandomTurn = true;
 
-    private class MovementQueue
-    {
-        private readonly Queue<float> movementQueue;
-        private readonly int capacity;
-        public enum QueueSource { None, RandomTurn, LargeTurn }
-        public QueueSource CurrentQueueSource { get; private set; } = QueueSource.None;
-        public bool Empty => movementQueue.Count == 0;
-        public int Count => movementQueue.Count;
-        public float NextAngle
-        {
-            get
-            {
-                if (movementQueue.Count == 1)
-                    CurrentQueueSource = QueueSource.None;
-                return movementQueue.Dequeue();
-            }
-        }
-
-        public MovementQueue(int capacity)
-        {
-            this.capacity = Mathf.Max(1, capacity);
-            movementQueue = new Queue<float>(capacity);
-        }
-        public void ClearQueue() 
-        { 
-            movementQueue.Clear();
-            CurrentQueueSource = QueueSource.None;
-        }
-        public void EnqueueMiniTurnsRelative(float startingAngle, float deltaAngle, QueueSource src)
-        {
-
-            if (!CanEnterNewValues(src)) return;
-            ClearQueue();
-            CurrentQueueSource = src;
-            float target = Utils.ConvertToAngle(startingAngle + deltaAngle);
-            float step = Mathf.DeltaAngle(startingAngle, target) / capacity;
-
-            float nextAngle;
-            for (int i = 1; i <= capacity; i++)
-            {
-                nextAngle = Utils.ConvertToAngle(startingAngle + step * i);
-                movementQueue.Enqueue(nextAngle);
-            }
-        }
-        public bool CanEnterNewValues(QueueSource src)
-        {
-            switch (CurrentQueueSource)
-            {
-                default:
-                case QueueSource.None: //if empty
-                    return true;
-                case QueueSource.LargeTurn:
-                    return false;
-                case QueueSource.RandomTurn:
-                    return src == QueueSource.LargeTurn;
-            }
-        }
-        public bool CanMakeLargeTurn() => CanEnterNewValues(QueueSource.LargeTurn);
-    }
     private MovementQueue movementQueue;
 
     private float currentVelocity = 0f;
@@ -584,5 +525,65 @@ public class TankMovementAI : EnemyAI
         else if (frameCount == 60)
             frameCount = -1;
         frameCount++;
+    }
+
+    private class MovementQueue
+    {
+        private readonly Queue<float> movementQueue;
+        private readonly int capacity;
+        public enum QueueSource { None, RandomTurn, LargeTurn }
+        public QueueSource CurrentQueueSource { get; private set; } = QueueSource.None;
+        public bool Empty => movementQueue.Count == 0;
+        public int Count => movementQueue.Count;
+        public float NextAngle
+        {
+            get
+            {
+                if (movementQueue.Count == 1)
+                    CurrentQueueSource = QueueSource.None;
+                return movementQueue.Dequeue();
+            }
+        }
+
+        public MovementQueue(int capacity)
+        {
+            this.capacity = Mathf.Max(1, capacity);
+            movementQueue = new Queue<float>(capacity);
+        }
+        public void ClearQueue()
+        {
+            movementQueue.Clear();
+            CurrentQueueSource = QueueSource.None;
+        }
+        public void EnqueueMiniTurnsRelative(float startingAngle, float deltaAngle, QueueSource src)
+        {
+
+            if (!CanEnterNewValues(src)) return;
+            ClearQueue();
+            CurrentQueueSource = src;
+            float target = Utils.ConvertToAngle(startingAngle + deltaAngle);
+            float step = Mathf.DeltaAngle(startingAngle, target) / capacity;
+
+            float nextAngle;
+            for (int i = 1; i <= capacity; i++)
+            {
+                nextAngle = Utils.ConvertToAngle(startingAngle + step * i);
+                movementQueue.Enqueue(nextAngle);
+            }
+        }
+        public bool CanEnterNewValues(QueueSource src)
+        {
+            switch (CurrentQueueSource)
+            {
+                default:
+                case QueueSource.None: //if empty
+                    return true;
+                case QueueSource.LargeTurn:
+                    return false;
+                case QueueSource.RandomTurn:
+                    return src == QueueSource.LargeTurn;
+            }
+        }
+        public bool CanMakeLargeTurn() => CanEnterNewValues(QueueSource.LargeTurn);
     }
 }

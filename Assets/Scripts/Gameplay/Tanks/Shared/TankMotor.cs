@@ -44,32 +44,6 @@ namespace Game.Gameplay.Tanks.Shared
 
         private void rotateHullTowardsMovingDirection(Vector2 currentVel)
         {
-            //// If we’re moving meaningfully, refresh the last move direction
-            //if (currentVel.sqrMagnitude > 0.0001f)
-            //    lastMoveDirection = currentVel.normalized;
-            //else if (desiredVelocity.sqrMagnitude > 0.0001f)
-            //    lastMoveDirection = desiredVelocity.normalized; // optional: let desired drive facing while accelerating
-
-            //// If still no direction, do nothing this frame
-            //if (lastMoveDirection.sqrMagnitude < 0.0001f) return;
-
-            //float target = Mathf.Atan2(lastMoveDirection.y, lastMoveDirection.x) * Mathf.Rad2Deg;
-            //// If your hull art faces +Y by default, do: target -= 90f;
-
-            //float current = rigidBody.rotation;
-
-            //// 180° symmetry: pick the equivalent orientation that minimizes rotation
-            //// Option A: face 'target'; Option B: face 'target + 180'
-            //float deltaA = Mathf.Abs(Mathf.DeltaAngle(current, target));
-            //float deltaB = Mathf.Abs(Mathf.DeltaAngle(current, target + 180f));
-            //if (deltaB < deltaA)
-            //    target += 180f;
-
-            //float maxStep = rotationSpeed * Time.fixedDeltaTime;
-            //float newAngle = Mathf.MoveTowardsAngle(current, target, maxStep);
-            //rigidBody.MoveRotation(newAngle);
-
-
             if (currentVel.sqrMagnitude > 0.0001f)
                 lastMoveDirection = currentVel.normalized;
             else if (desiredVelocity.sqrMagnitude > 0.0001f)
