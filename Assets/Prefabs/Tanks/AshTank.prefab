@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2780418388653277588}
   - component: {fileID: 7055785500995483351}
   - component: {fileID: 6375145360895304136}
+  - component: {fileID: 518407168028818395}
   m_Layer: 9
   m_Name: AshTank
   m_TagString: Enemy
@@ -145,6 +146,7 @@ MonoBehaviour:
   cooldownSeconds: 0.25
   maxActive: 1
   isPlayer: 0
+  <BulletTint>k__BackingField: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -248,6 +250,20 @@ MonoBehaviour:
   word36_RandomTimerB: 90
   shooter: {fileID: 4634876464340005560}
   lineOfSight: {fileID: 4570946905251452916}
+--- !u!114 &518407168028818395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 290090536791198282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3daf3a7f2e0b7bc45913d623be5c355d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 0}
+  affectBullet: 1
 --- !u!1 &3287747312142812771
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,7 +374,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: be4edc3ac8b033444a0ddbe80277473e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -490,7 +506,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: e06cf71834d54cb4a8ba8911624bd84d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
