@@ -155,8 +155,8 @@ public class DumbestMovingTankAI : EnemyAI
     }
     private MovementQueue movementQueue;
 
-    private float currentVelocity_InternalPerFrame = 0f;
-    private float requestedSpeed_InternalPerFrame = 0f;
+    private float currentVelocity = 0f;
+    private float requestedSpeed = 0f;
     private float turnTargetAngleDeg;
     private bool moveForwardThisFrame = true;
     private Vector2 ForwardDirection => hull.up.normalized;
@@ -300,9 +300,7 @@ public class DumbestMovingTankAI : EnemyAI
     private float computeSurvivalEscapeAngle()
     {
         Vector2 away = ComputeSurvivalEscapeVector();
-        //if (away.sqrMagnitude > 0.0001f)
-        //    return arctanDeg(away.y, away.x);
-        return arctanDeg(away.y, away.x);
+        return Utils.VectorToAngle(away);
     }
 
     private void enterAnglesForRandomTurnToQueue()
@@ -370,7 +368,7 @@ public class DumbestMovingTankAI : EnemyAI
     // ───────────────────────── step 4: request speed ─────────────────────────
     private void ComputeRequestedSpeed()
     {
-        requestedSpeed_InternalPerFrame = Mathf.Max(0f, word23_MaxSpeed);
+        requestedSpeed = Mathf.Max(0f, word23_MaxSpeed);
     }
 
     // ───────────────────────── step 5: accel/decel/stuns/clamp ─────────────────────────
@@ -378,19 +376,19 @@ public class DumbestMovingTankAI : EnemyAI
     {
         float requiredTurnNow = Mathf.Abs(Mathf.DeltaAngle(getFacingAngleDeg(), turnTargetAngleDeg));
 
-        if (requiredTurnNow > word27_MaxTurnPivotDeg || requestedSpeed_InternalPerFrame < currentVelocity_InternalPerFrame)
+        if (requiredTurnNow > word27_MaxTurnPivotDeg || requestedSpeed < currentVelocity)
         {
-            currentVelocity_InternalPerFrame *= Mathf.Clamp01(word12_DecelMul);
+            currentVelocity *= Mathf.Clamp01(word12_DecelMul);
         }
-        else if (requestedSpeed_InternalPerFrame > currentVelocity_InternalPerFrame)
+        else if (requestedSpeed > currentVelocity)
         {
-            currentVelocity_InternalPerFrame += word11_Accel;
+            currentVelocity += word11_Accel;
         }
 
         if (bulletStunTimerFrames > 0 || mineStunTimerFrames > 0)
-            currentVelocity_InternalPerFrame = 0f;
+            currentVelocity = 0f;
 
-        currentVelocity_InternalPerFrame = Mathf.Min(currentVelocity_InternalPerFrame, word23_MaxSpeed);
+        currentVelocity = Mathf.Min(currentVelocity, word23_MaxSpeed);
 
         if (bulletStunTimerFrames > 0) bulletStunTimerFrames--;
         if (mineStunTimerFrames > 0) mineStunTimerFrames--;
@@ -400,7 +398,7 @@ public class DumbestMovingTankAI : EnemyAI
     private void MoveAgentAlongCurrentFacing()
     {
         Vector2 dir2D = hull.up * (moveForwardThisFrame ? 1f : -1f);
-        float unitsPerSecond = currentVelocity_InternalPerFrame * simulationFps * internalUnitsToUnity;
+        float unitsPerSecond = currentVelocity * simulationFps * internalUnitsToUnity;
 
         agent.speed = unitsPerSecond;
 
@@ -436,35 +434,73 @@ public class DumbestMovingTankAI : EnemyAI
     private Vector2 ComputeSurvivalEscapeVector()
     {
         Vector2 sum = Vector2.zero;
-        AccumulateInverseVectors(aiMineMask, "Enemy", word16_AIMineAwareness, ref sum);
-        AccumulateInverseVectors(playerMineMask, "Player", word18_PlayerMineAwareness, ref sum);
-        AccumulateInverseVectors(aiBulletMask, "Enemy", word17_AIBulletAwareness, ref sum, onlyTowardMe: true);
-        AccumulateInverseVectors(playerBulletMask, "Player", word19_PlayerBulletAwareness, ref sum, onlyTowardMe: true);
+        AccumulateInverseVectors(word16_AIMineAwareness, ref sum, aiMineMask, "Enemy");
+        AccumulateInverseVectors(word18_PlayerMineAwareness, ref sum, playerMineMask, "Player");
+        AccumulateInverseVectors(word17_AIBulletAwareness, ref sum, aiBulletMask, "Enemy", checkHeadingTowardsMe: true);
+        AccumulateInverseVectors(word19_PlayerBulletAwareness, ref sum, playerBulletMask, "Player", checkHeadingTowardsMe: true);
+        //AccumulateInverseVectors(getlookDistance(), ref sum, LayerMask.GetMask("Walls"));
         return sum.normalized;
     }
 
-    private void AccumulateInverseVectors(LayerMask mask, string tag, float radiusInternal, ref Vector2 sum, bool onlyTowardMe = false)
+    private void AccumulateInverseVectors(float radiusInternal, ref Vector2 sum, LayerMask? mask = null
+        , string tag = null, bool checkHeadingTowardsMe = false)
     {
         if (radiusInternal <= 0f) return;
         float r = radiusInternal * internalUnitsToUnity;
-        var hits = Physics2D.OverlapCircleAll(hull.position, r, mask);
-        foreach (var h in hits)
+        Collider2D[] objectsInArea;
+        if (mask.HasValue)
+            objectsInArea = Physics2D.OverlapCircleAll(hull.position, r, mask.Value);
+        else
+            objectsInArea = Physics2D.OverlapCircleAll(hull.position, r);
+
+        foreach (var objectInArea in objectsInArea)
         {
-            if (!h.CompareTag(tag)) 
+            if (tag != null && !objectInArea.CompareTag(tag))
                 continue;
 
-            Vector2 to = (Vector2)(h.transform.position - hull.position);
-            if (onlyTowardMe)
+            Vector2 to = Utils.VectorFromOnePointToAnother(hull, objectInArea.transform);
+            if (checkHeadingTowardsMe)
             {
-                var rb = h.attachedRigidbody;
-                if (rb != null)
+                var rb = objectInArea.attachedRigidbody;
+                if (rb)
                 {
                     float approaching = Vector2.Dot(rb.linearVelocity.normalized, to.normalized);
-                    if (approaching <= 0f) continue;
+                    if (approaching >= -0.05f)
+                        continue;
                 }
             }
-            if (to.sqrMagnitude > 0.0001f) sum += (-to).normalized;
+            if (to.sqrMagnitude > 0.0001f)
+            {
+                Vector2 away = (-to).normalized;
+                away = steerAwayFromWallIfBlocked(away);
+                sum += away;
+            }
         }
+    }
+
+    private Vector2 steerAwayFromWallIfBlocked(Vector2 desiredAwayDir)
+    {
+        float look = getlookDistance();
+        Vector3 start = hull.position;
+        Vector3 end = start + (Vector3)(desiredAwayDir * look);
+
+        if (agent.Raycast(end, out _))
+        {
+            Vector2 left = new Vector2(-desiredAwayDir.y, desiredAwayDir.x);
+            Vector2 right = new Vector2(desiredAwayDir.y, -desiredAwayDir.x);
+
+            bool leftBlocked = agent.Raycast(start + (Vector3)(left * look), out _);
+            bool rightBlocked = agent.Raycast(start + (Vector3)(right * look), out _);
+
+            if (leftBlocked && rightBlocked) return -desiredAwayDir; // boxed in → fallback
+            if (!leftBlocked && rightBlocked) return left;
+            if (leftBlocked && !rightBlocked) return right;
+
+            // both open: prefer the side closer to current forward to reduce sharp pivots
+            return Vector2.Dot(left, ForwardDirection) >= Vector2.Dot(right, ForwardDirection) ? left : right;
+        }
+
+        return desiredAwayDir; // clear path along the desired away vector
     }
 
     private bool AnyBulletHeadingTowardsMe(LayerMask mask, float radiusInternal, string tag)
@@ -487,7 +523,7 @@ public class DumbestMovingTankAI : EnemyAI
     private float getlookDistance()
     {
         float N = Mathf.Max(0f, word28_ObstacleAwareness / 2f);
-        float lookDistInternal = Mathf.Max(1f, currentVelocity_InternalPerFrame * N + 2f);
+        float lookDistInternal = Mathf.Max(1f, currentVelocity * N + 2f);
         return lookDistInternal * internalUnitsToUnity;
     }
 
@@ -520,7 +556,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     private float getFacingAngleDeg()
     {
-        return arctanDeg(hull.up.y, hull.up.x);
+        return Utils.VectorToAngle(hull.up);
     }
 
     private float getOppositeFacingAngleDeg()
@@ -535,15 +571,6 @@ public class DumbestMovingTankAI : EnemyAI
         hull.up = dir.normalized;
     }
 
-    private static float arctanDeg(float y, float x)
-    {
-        return Mathf.Atan2(y, x) * Mathf.Rad2Deg;
-    }
-
-    private static float getAngleFromDir(Vector2 dir) => arctanDeg(dir.y, dir.x);
-
-    private static float SignedAngleDeg(float fromDeg, float toDeg) => Mathf.DeltaAngle(fromDeg, toDeg);
-
     private int frameCount = 0;
     private void printLog(string message)
     {
@@ -553,8 +580,4 @@ public class DumbestMovingTankAI : EnemyAI
             frameCount = -1;
         frameCount++;
     }
-
-    // Public hooks (unchanged)
-    //public void NotifyMineMovementOverride() => mineMovementOverrideFlag = true;
-    //public void ForceMovementOpportunityNextFrame() => turningTimerFrames = Mathf.Max(turningTimerFrames, randomTurningValue);
 }

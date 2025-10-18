@@ -20,7 +20,8 @@ namespace Game.Gameplay.Level
         [HideInInspector] public List<GameObject> EnemyInstances;
 
         private Vector2 initialPlayerPosition;
-        private List<(GameObject, Vector2)> EnemyInstancesAndInitialPos = new List<(GameObject, Vector2)>();
+        private List<(GameObject enemy, Vector2 position)> EnemyInstancesAndInitialPos 
+            = new List<(GameObject, Vector2)>();
 
         public void Load(GameObject def)
         {
@@ -37,8 +38,8 @@ namespace Game.Gameplay.Level
 
             foreach (var e in EnemyInstancesAndInitialPos)
             {
-                e.Item1.transform.position = e.Item2;
-                e.Item1.GetComponent<Health>().Revive();
+                e.enemy.transform.position = e.position;
+                e.enemy.GetComponent<Health>().Revive();
             }
 
             return StageInstance;

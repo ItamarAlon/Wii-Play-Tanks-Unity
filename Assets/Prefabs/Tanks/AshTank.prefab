@@ -185,9 +185,9 @@ MonoBehaviour:
   simulationFps: 60
   word11_Accel: 0.3
   word12_DecelMul: 0.6
-  word13_RandomTurnMaxAngle: 90
-  word14_TimerA: 300
-  word15_TimerB: 400
+  word13_RandomTurnMaxAngle: 30
+  word14_TimerA: 20
+  word15_TimerB: 150
   word16_AIMineAwareness: 120
   word17_AIBulletAwareness: 120
   word18_PlayerMineAwareness: 0
@@ -196,8 +196,8 @@ MonoBehaviour:
   word21_Aggressiveness: 0.08
   word22_QueueCount: 4
   word23_MaxSpeed: 0.02
-  word26_TurnSpeedRadPerFrame: 0.04
-  word27_MaxTurnPivotDeg: 10
+  word26_TurnSpeedRadPerFrame: 0.02
+  word27_MaxTurnPivotDeg: 50
   word28_ObstacleAwareness: 30
   aiBulletMask:
     serializedVersion: 2
