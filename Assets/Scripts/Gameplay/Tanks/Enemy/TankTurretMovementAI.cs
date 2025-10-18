@@ -16,10 +16,14 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] float word39_TurretTurnSpeedRadPerFrame = 0.08f;
         [SerializeField] int word40_TurretTargetTimer = 40;
 
+        [SerializeField] bool alwaysEnabled = false;
+
         private float AnglePerFrame => word39_TurretTurnSpeedRadPerFrame * Mathf.Rad2Deg;
         private float fps = 25;
         private float desiredAngle;
         private float CurrentLookingAngle { get => turretPivot.eulerAngles.z; }
+        public override bool Enable { get; set; }
+
         private bool isTurretPointingAtDesired = false;
 
         void Start()
@@ -32,7 +36,8 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         void Update()
         {
-            rotateTurretTowardsDesired();
+            if (Enable || alwaysEnabled)
+                rotateTurretTowardsDesired();
         }
 
         private void generateDesiredLookingDirection()

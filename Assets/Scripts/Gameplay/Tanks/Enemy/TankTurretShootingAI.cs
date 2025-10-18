@@ -15,6 +15,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
         [SerializeField] TankLineOfSight lineOfSight;
 
         private bool CanShoot => lineOfSight.PlayerInSight && !lineOfSight.EnemyInSight;
+        public override bool Enable { get; set; }
 
         void OnValidate()
         {
@@ -38,7 +39,7 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         void Update()
         {
-            if (CanShoot)
+            if (CanShoot && Enable)
                 waitRandomTimeThenShoot();
         }
 
@@ -52,7 +53,8 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
             int randomTimer = generateRandomTimer();
             for (int i = 0; i < randomTimer; i++)
                 yield return null;
-            shooter.TryFire();
+            if (Enable)
+                shooter.TryFire();
         }
 
         private int generateRandomTimer()

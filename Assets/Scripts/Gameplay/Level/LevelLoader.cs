@@ -63,7 +63,7 @@ namespace Game.Gameplay.Level
         {
             Shooter shooter = tank.GetComponent<Shooter>();
             if (shooter)
-                shooter.DestroyBullets();
+                shooter.ClearBullets();
         }
 
         private void assignAllTanks(GameObject stageInstance)

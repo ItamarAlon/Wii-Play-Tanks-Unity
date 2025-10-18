@@ -6,7 +6,7 @@ using Assets.Scripts.Gameplay.Tanks.Enemy;
 /// <summary>
 /// TankTurretShooterAI (refactor: same behavior, smaller methods)
 /// </summary>
-public class TankTurretShooterAI : EnemyAI
+public class TankTurretShooterAI : MonoBehaviour
 {
     [Header("Prefab Refs (see hierarchy screenshot)")]
     [SerializeField] Transform turretPivot; // rotates around tank center

@@ -12,7 +12,7 @@ using UnityEngine.AI;
 /// Wii Play Tanks - Dumbest Moving Tank (Movement-Only AI) – refactor only (behavior unchanged)
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
-public class DumbestMovingTankAI : EnemyAI
+public class TankMovementAI : EnemyAI
 {
     [Header("NavMesh / 2D Setup")]
     [Tooltip("Assign your NavMeshAgent (NavMeshPlus 2D: set updateRotation=false, updateUpAxis=false).")]
@@ -76,6 +76,17 @@ public class DumbestMovingTankAI : EnemyAI
     [Tooltip("Word 28 – Obstacle Awareness (Movement) look-ahead factor (frames). N = Word28 / 2.")]
     public int word28_ObstacleAwareness = 30;
 
+    private bool enable;
+    public override bool Enable
+    {
+        get => enable;
+        set
+        {
+            enable = value;
+            agent.enabled = value;
+        }
+    }
+
     [Header("Layers / Detection (2D)")]
     public LayerMask aiBulletMask;
     public LayerMask playerBulletMask;
@@ -87,12 +98,6 @@ public class DumbestMovingTankAI : EnemyAI
 
     // === Internal state (unchanged) ===
     private bool allowedRandomTurn = true;
-
-    //private bool survivalModeFlag;
-    //private bool largeTurnFlag;
-    //private bool sequenceTurnFlag;
-    //private bool randomTurnFlag;
-    //private bool mineMovementOverrideFlag = false;
 
     private class MovementQueue
     {
@@ -188,9 +193,7 @@ public class DumbestMovingTankAI : EnemyAI
 
     void Update()
     {
-        //Debug.Log($"Queue Count: {movementQueue.Count}");
-        //StartCoroutine(movementOpportunityRoutine());
-        //calculateNewTurn();
+        if (!Enable) return;
         RotateBodyTowardTurnTarget();
         ComputeRequestedSpeed();
         ApplyAccelDecelAndStuns();
@@ -464,8 +467,7 @@ public class DumbestMovingTankAI : EnemyAI
                 var rb = objectInArea.attachedRigidbody;
                 if (rb)
                 {
-                    float approaching = Vector2.Dot(rb.linearVelocity.normalized, to.normalized);
-                    if (approaching >= -0.05f)
+                    if (!Utils.AreVectorsHeadingTheSameDirection(rb.linearVelocity, to))
                         continue;
                 }
             }
@@ -503,19 +505,22 @@ public class DumbestMovingTankAI : EnemyAI
         return desiredAwayDir; // clear path along the desired away vector
     }
 
-    private bool AnyBulletHeadingTowardsMe(LayerMask mask, float radiusInternal, string tag)
+    private bool AnyBulletHeadingTowardsMe(LayerMask bulletMask, float radiusInternal, string tag)
     {
-        float r = radiusInternal * internalUnitsToUnity;
-        var hits = Physics2D.OverlapCircleAll(hull.position, r, mask);
-        foreach (var h in hits)
+        float radius = radiusInternal * internalUnitsToUnity;
+        var detectedBullets = Physics2D.OverlapCircleAll(hull.position, radius, bulletMask);
+        foreach (var bullet in detectedBullets)
         {
-            if (!h.CompareTag(tag)) continue;
-            var rb = h.attachedRigidbody;
-            if (rb == null) return true;
-            Vector2 to = (Vector2)(hull.position - h.transform.position);
-            if (to.sqrMagnitude < 0.0001f) return true;
-            float dot = Vector2.Dot(rb.linearVelocity.normalized, to.normalized);
-            if (dot > 0f) return true;
+            if (!bullet.CompareTag(tag))
+                continue;
+            var rb = bullet.attachedRigidbody;
+            if (rb == null)
+                continue;
+            Vector2 bulletToTankVector = Utils.VectorFromOnePointToAnother(bullet.transform, hull);
+            if (bulletToTankVector.sqrMagnitude < 0.0001f)
+                continue;
+            if (Utils.AreVectorsHeadingTheSameDirection(rb.linearVelocity, bulletToTankVector)) 
+                return true;
         }
         return false;
     }

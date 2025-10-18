@@ -89,12 +89,12 @@ namespace Game.GameLoop
                     continue;
 
                 EnemyAI[] aiScripts = enemyTank.GetComponents<EnemyAI>();
-                NavMeshAgent agent = enemyTank.GetComponent<NavMeshAgent>();
+                //NavMeshAgent agent = enemyTank.GetComponent<NavMeshAgent>();
 
                 foreach (var script in aiScripts)
-                    script.enabled = enabled;
-                if (agent) 
-                    agent.enabled = enabled;
+                    script.Enable = enabled;
+                //if (agent) 
+                //    agent.enabled = enabled;
             }
         }
     }

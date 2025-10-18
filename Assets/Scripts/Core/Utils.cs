@@ -53,6 +53,11 @@ namespace Assets.Scripts.Core
             toRotate.rotation = Quaternion.Euler(0f, 0f, angleToRotateBy);
         }
 
+        public static bool AreVectorsHeadingTheSameDirection(Vector2 vector1, Vector2 vector2)
+        {
+            return Vector2.Dot(vector1.normalized, vector2.normalized) > 0;
+        }
+
         /// <summary>
         /// converts a number to a degree: between 0 and 360
         /// </summary>

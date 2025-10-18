@@ -231,6 +231,7 @@ MonoBehaviour:
   word29_TurretAngleOffset: 0
   word39_TurretTurnSpeedRadPerFrame: 0.05
   word40_TurretTargetTimer: 16
+  alwaysEnabled: 1
 --- !u!114 &2193837883936725229
 MonoBehaviour:
   m_ObjectHideFlags: 0
