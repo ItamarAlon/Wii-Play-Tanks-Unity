@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using Game.Gameplay.Level;
 using Game.UI;
 using System.Collections;
+using System;
 
 namespace Game.GameLoop
 {
@@ -22,17 +23,19 @@ namespace Game.GameLoop
         public int CurrentStageIndex { get; private set; } = 0;
         
         private int CurrentStageNum { get => CurrentStageIndex + 1; }
+        private bool allowStagePreview = true;
         private bool inStagePreview = false;
 
         void Awake()
         {
-            pauseMenu.Toggled += PauseMenu_Toggled;
+            pauseMenu.ToggleRequested += PauseMenu_Toggled;
         }
 
-        private void PauseMenu_Toggled(object sender, System.EventArgs e)
+        private void PauseMenu_Toggled(object sender, EventArgs e)
         {
             bool wasPaused = e as EventArgs<bool>;
             stageManager.SetGameplayEnabled(!wasPaused, true);
+            toggleStagePreview(!wasPaused);
         }
 
         void Start()
@@ -103,6 +106,14 @@ namespace Game.GameLoop
             hud.SetKills(TotalKills);
         }
 
+        private void toggleStagePreview(bool? enablePreview = null)
+        {
+            if (enablePreview.HasValue)
+                allowStagePreview = enablePreview.Value;
+            else
+                allowStagePreview = !allowStagePreview;
+        }
+
         private IEnumerator StageRoutine()
         {
             stageManager.SetGameplayEnabled(false);
@@ -110,6 +121,9 @@ namespace Game.GameLoop
             float t = previewTimeSeconds;
             while (t > 0f)
             {
+                while (!allowStagePreview)
+                    yield return null;
+
                 if (banner)
                     banner.Show(CurrentStageNum, t);
                 t -= Time.unscaledDeltaTime;
@@ -118,6 +132,7 @@ namespace Game.GameLoop
             if (banner) 
                 banner.Hide();
             inStagePreview = false;
+            allowStagePreview = true;
             stageManager.SetGameplayEnabled(true);
         }
     }

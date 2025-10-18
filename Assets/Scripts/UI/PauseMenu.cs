@@ -8,8 +8,14 @@ namespace Game.UI
     public class PauseMenu : MonoBehaviour
     {
         [SerializeField] GameObject panel;
-        private bool paused;
-        public event EventHandler Toggled;
+        private bool paused = false;
+        public event EventHandler ToggleRequested;
+        public event EventHandler RestartRequested;
+
+        void Awake()
+        {
+            panel.SetActive(false);
+        }
 
         void Update()
         {
@@ -23,19 +29,28 @@ namespace Game.UI
             if (panel) 
                 panel.SetActive(paused);
             Time.timeScale = paused ? 0f : 1f;
-            OnToggled(paused);
+            OnToggleRequested(paused);
         }
 
+        protected virtual void OnToggleRequested(EventArgs<bool> e)
+        {
+            ToggleRequested?.Invoke(this, e);
+        }
+
+        protected virtual void OnRestartRequested(EventArgs e)
+        {
+            RestartRequested?.Invoke(this, e);
+        }
+
+        //Buttons//
+        public void OnPause() => Toggle();
         public void OnResume() => Toggle();
-        public void OnQuitToTitle()
+        public void OnRestart() => OnRestartRequested(EventArgs.Empty);
+        public void OnQuitGame() => Application.Quit();
+        public void OnMainMenu()
         {
             Time.timeScale = 1f;
             SceneManager.LoadScene("Title");
-        }
-
-        protected virtual void OnToggled(EventArgs<bool> e)
-        {
-            Toggled?.Invoke(this, e);
         }
     }
 }
