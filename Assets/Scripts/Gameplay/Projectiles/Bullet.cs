@@ -19,7 +19,7 @@ namespace Game.Gameplay.Projectiles
 
         void Awake()
         {
-            _rb = GetComponent<Rigidbody2D>();        
+            _rb = GetComponent<Rigidbody2D>();   
         }
 
         public void SetOwner(Shooter s) => _owner = s;

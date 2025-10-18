@@ -86,8 +86,7 @@ public class DumbestMovingTankAI : EnemyAI
     public Transform playerTarget;
 
     // === Internal state (unchanged) ===
-    private int turningTimerFrames = 0;
-    private int randomTurningValue;
+    private bool allowedRandomTurn = true;
 
     //private bool survivalModeFlag;
     //private bool largeTurnFlag;
@@ -125,17 +124,6 @@ public class DumbestMovingTankAI : EnemyAI
         }
         public void EnqueueMiniTurnsRelative(float startingAngle, float deltaAngle, QueueSource src)
         {
-            //if (!CanEnterNewValues(src)) return;
-            //ClearQueue();
-            //CurrentQueueSource = src;
-            //float step = deltaAngle / capacity;
-
-            //float nextAngle;
-            //for (int i = 1; i <= capacity; i++)
-            //{
-            //    nextAngle = Utils.ConvertToAngle(startingAngle + step * i);
-            //    movementQueue.Enqueue(nextAngle);
-            //}
 
             if (!CanEnterNewValues(src)) return;
             ClearQueue();
@@ -225,6 +213,13 @@ public class DumbestMovingTankAI : EnemyAI
 
             Debug.DrawLine(hull.position, agent.destination);
         }
+    }
+
+    private IEnumerator randomTurnCooldownRoutine(float waitTimeSeconds)
+    {
+        allowedRandomTurn = false;
+        yield return new WaitForSeconds(waitTimeSeconds);
+        allowedRandomTurn = true;
     }
 
     private void calculateNewTurn()
@@ -324,7 +319,7 @@ public class DumbestMovingTankAI : EnemyAI
     private void enterAnglesForLargeTurnToQueue()
     {
         Debug.Log("Large");
-        var (leftOpen, rightOpen) = ProbeLeftRightForLargeTurn_NavMesh(getlookDistance());
+        var (leftOpen, rightOpen) = ProbeLeftRightForLargeTurn(getlookDistance());
 
         if (leftOpen || rightOpen)
         {
@@ -508,7 +503,7 @@ public class DumbestMovingTankAI : EnemyAI
         return IsThereObstacleAhead(getlookDistance());
     }
 
-    (bool leftOpen, bool rightOpen) ProbeLeftRightForLargeTurn_NavMesh(float distanceUnity)
+    (bool leftOpen, bool rightOpen) ProbeLeftRightForLargeTurn(float distanceUnity)
     {
         Vector3 start = hull.position;
         Vector3 leftEnd = start + (Vector3)Rotate90(hull.up, +1) * distanceUnity;
@@ -561,5 +556,5 @@ public class DumbestMovingTankAI : EnemyAI
 
     // Public hooks (unchanged)
     //public void NotifyMineMovementOverride() => mineMovementOverrideFlag = true;
-    public void ForceMovementOpportunityNextFrame() => turningTimerFrames = Mathf.Max(turningTimerFrames, randomTurningValue);
+    //public void ForceMovementOpportunityNextFrame() => turningTimerFrames = Mathf.Max(turningTimerFrames, randomTurningValue);
 }

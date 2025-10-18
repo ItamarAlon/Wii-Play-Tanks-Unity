@@ -13,6 +13,7 @@ using UnityEngine.SceneManagement;
 using Assets.Scripts.Gameplay.Tanks.Enemy;
 using UnityEngine.AI;
 using System.Linq;
+using System;
 
 namespace Game.GameLoop
 {
@@ -47,7 +48,7 @@ namespace Game.GameLoop
         private void wirePlayerAndEnemies()
         {
             var playerH = levelLoader.PlayerInstance.GetComponent<Health>();
-            playerH.OnDeath += _ => run.OnPlayerDied();
+            playerH.OnDeath += (s,e) => run.OnPlayerDied();
 
             aliveEnemiesCount = 0;
             foreach (var e in levelLoader.EnemyInstances)
@@ -62,8 +63,9 @@ namespace Game.GameLoop
             enemiesInCurrentStageCount = aliveEnemiesCount;
         }
 
-        private void OnEnemyDeath(Health h)
+        private void OnEnemyDeath(object sender, EventArgs e)
         {
+            Health h = sender as Health;
             aliveEnemiesCount--;
             run.AddKill();
             if (decals) decals.PlaceX(h.transform.position);

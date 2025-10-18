@@ -9,7 +9,8 @@ namespace Game.Gameplay.Tanks.Shared
 {
     public class Health : MonoBehaviour
     {
-        public event Action<Health> OnDeath;
+        public event EventHandler OnDeath;
+        public event EventHandler OnRevive;
         public bool IsDead { get; private set; }
 
         public void Kill()
@@ -17,7 +18,7 @@ namespace Game.Gameplay.Tanks.Shared
             if (IsDead) return;
             IsDead = true;
             gameObject.SetActive(false);
-            OnDeath?.Invoke(this);
+            OnOnDeath(EventArgs.Empty);
         }
 
         public void Revive()
@@ -25,6 +26,16 @@ namespace Game.Gameplay.Tanks.Shared
             if (!IsDead) return;
             IsDead = false;
             gameObject.SetActive(true);
+            OnOnRevive(EventArgs.Empty);
+        }
+
+        protected virtual void OnOnDeath(EventArgs e)
+        {
+            OnDeath?.Invoke(this, e);
+        }
+        protected virtual void OnOnRevive(EventArgs e)
+        {
+            OnRevive?.Invoke(this, e);
         }
     }
 }

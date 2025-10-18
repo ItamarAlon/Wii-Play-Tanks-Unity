@@ -46,9 +46,9 @@ namespace Game.Gameplay.Level
 
         public void Clear()
         {
+            RemoveAllBullets();
             EnemyInstances.Clear();
             EnemyInstancesAndInitialPos.Clear();
-            RemoveAllBullets();
         }
 
         public void RemoveAllBullets()
@@ -62,7 +62,7 @@ namespace Game.Gameplay.Level
         {
             Shooter shooter = tank.GetComponent<Shooter>();
             if (shooter)
-                shooter.ClearBullets();
+                shooter.DestroyBullets();
         }
 
         private void assignAllTanks(GameObject stageInstance)

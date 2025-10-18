@@ -22,7 +22,7 @@ namespace Game.Gameplay.Tanks.Shared
         [SerializeField] bool isPlayer;
 
         private bool isCooldownActive = false;
-        private int _active;
+        private int active;
         private Collider2D _collider;
         private ObjectPool<Bullet> _bulletPool;
         private List<Bullet> activeBullets = new List<Bullet>();
@@ -43,14 +43,14 @@ namespace Game.Gameplay.Tanks.Shared
         public void TryFire(Vector2 dir)
         {
             if (isCooldownActive) return;
-            if (_active >= maxActive) return;
+            if (active >= maxActive) return;
             if (!BulletPrefab || !Muzzle) return;
 
             Bullet bullet = _bulletPool.Get();
             activeBullets.Add(bullet);
 
             bullet.Launch(dir.normalized * MuzzleSpeed);
-            _active++;
+            active++;
             startCooldown();
         }
 
@@ -73,24 +73,28 @@ namespace Game.Gameplay.Tanks.Shared
 
         public void ReleaseBullet(Bullet bullet)
         {
-            if (bullet == null) return;
-            if (_active > 0)
+            if (!bullet) return;
+            if (active > 0)
             {
-                _active--;
+                active--;
                 _bulletPool.Release(bullet);
                 activeBullets.Remove(bullet);
             }
         }
 
+        public void DestroyBullets()
+        {
+            activeBullets.ForEach(bullet => Destroy(bullet.gameObject));
+            activeBullets.Clear();
+            _bulletPool.Clear();
+            active = 0;
+        }
+
         public void ClearBullets()
         {
-            _bulletPool.Clear();
-            foreach (Bullet bullet in activeBullets)
-            {
-                Destroy(bullet.gameObject);
-            }
+            activeBullets.ForEach(_bulletPool.Release);
             activeBullets.Clear();
-            _active = 0;
+            active = 0;
         }
 
         private Bullet createBullet()
@@ -116,7 +120,7 @@ namespace Game.Gameplay.Tanks.Shared
 
         private void OnDestroy()
         {
-            ClearBullets();
+            DestroyBullets();
         }
     }
 }
