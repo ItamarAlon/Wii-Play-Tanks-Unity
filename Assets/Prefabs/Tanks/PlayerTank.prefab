@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hullVisual: {fileID: 4542270977892972629}
   moveSpeed: 1.8
   accel: 10
   rotationSpeed: 450

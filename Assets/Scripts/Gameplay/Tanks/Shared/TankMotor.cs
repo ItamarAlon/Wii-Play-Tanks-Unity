@@ -10,6 +10,8 @@ namespace Game.Gameplay.Tanks.Shared
     [RequireComponent(typeof(Rigidbody2D))]
     public class TankMotor : MonoBehaviour
     {
+        [SerializeField] Transform hullVisual;
+
         public float moveSpeed = 5f;
         public float accel = 20f;
         public float rotationSpeed = 450f;
@@ -42,30 +44,60 @@ namespace Game.Gameplay.Tanks.Shared
 
         private void rotateHullTowardsMovingDirection(Vector2 currentVel)
         {
-            // If we’re moving meaningfully, refresh the last move direction
+            //// If we’re moving meaningfully, refresh the last move direction
+            //if (currentVel.sqrMagnitude > 0.0001f)
+            //    lastMoveDirection = currentVel.normalized;
+            //else if (desiredVelocity.sqrMagnitude > 0.0001f)
+            //    lastMoveDirection = desiredVelocity.normalized; // optional: let desired drive facing while accelerating
+
+            //// If still no direction, do nothing this frame
+            //if (lastMoveDirection.sqrMagnitude < 0.0001f) return;
+
+            //float target = Mathf.Atan2(lastMoveDirection.y, lastMoveDirection.x) * Mathf.Rad2Deg;
+            //// If your hull art faces +Y by default, do: target -= 90f;
+
+            //float current = rigidBody.rotation;
+
+            //// 180° symmetry: pick the equivalent orientation that minimizes rotation
+            //// Option A: face 'target'; Option B: face 'target + 180'
+            //float deltaA = Mathf.Abs(Mathf.DeltaAngle(current, target));
+            //float deltaB = Mathf.Abs(Mathf.DeltaAngle(current, target + 180f));
+            //if (deltaB < deltaA)
+            //    target += 180f;
+
+            //float maxStep = rotationSpeed * Time.fixedDeltaTime;
+            //float newAngle = Mathf.MoveTowardsAngle(current, target, maxStep);
+            //rigidBody.MoveRotation(newAngle);
+
+
             if (currentVel.sqrMagnitude > 0.0001f)
                 lastMoveDirection = currentVel.normalized;
             else if (desiredVelocity.sqrMagnitude > 0.0001f)
-                lastMoveDirection = desiredVelocity.normalized; // optional: let desired drive facing while accelerating
+                lastMoveDirection = desiredVelocity.normalized;
 
-            // If still no direction, do nothing this frame
-            if (lastMoveDirection.sqrMagnitude < 0.0001f) return;
+            if (lastMoveDirection.sqrMagnitude < 0.0001f || !hullVisual) return;
 
             float target = Mathf.Atan2(lastMoveDirection.y, lastMoveDirection.x) * Mathf.Rad2Deg;
-            // If your hull art faces +Y by default, do: target -= 90f;
+            // If your sprite faces +Y by default, offset: target -= 90f;
 
-            float current = rigidBody.rotation;
+            // current visual angle (read from child, not rigidbody)
+            float current = hullVisual.eulerAngles.z;
 
-            // 180° symmetry: pick the equivalent orientation that minimizes rotation
-            // Option A: face 'target'; Option B: face 'target + 180'
-            float deltaA = Mathf.Abs(Mathf.DeltaAngle(current, target));
-            float deltaB = Mathf.Abs(Mathf.DeltaAngle(current, target + 180f));
-            if (deltaB < deltaA)
-                target += 180f;
+            // 180° symmetry: choose the closest of target or target+180°
+            float da = Mathf.Abs(Mathf.DeltaAngle(current, target));
+            float db = Mathf.Abs(Mathf.DeltaAngle(current, target + 180f));
+            if (db < da) target += 180f;
+
+            // optional tiny epsilon to treat “exact opposite” as same (no micro-wiggle)
+            const float oppositeEps = 0.1f;
+            if (Mathf.Abs(Mathf.DeltaAngle(current, target)) <= oppositeEps)
+                return;
 
             float maxStep = rotationSpeed * Time.fixedDeltaTime;
             float newAngle = Mathf.MoveTowardsAngle(current, target, maxStep);
-            rigidBody.MoveRotation(newAngle);
+
+            // rotate the VISUAL only
+            hullVisual.rotation = Quaternion.Euler(0f, 0f, newAngle);
         }
     }
 }
