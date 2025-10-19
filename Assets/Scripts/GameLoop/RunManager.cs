@@ -22,20 +22,21 @@ namespace Game.GameLoop
         public int TotalKills { get; private set; }
         public int CurrentStageIndex { get; private set; } = 0;
         
-        private int CurrentStageNum { get => CurrentStageIndex + 1; }
+        private int CurrentStageNum => CurrentStageIndex + 1;
         private bool allowStagePreview = true;
         private bool inStagePreview = false;
 
         void Awake()
         {
+            TitleMenu titleMenu = FindFirstObjectByType<TitleMenu>();
             pauseMenu.ToggleRequested += PauseMenu_ToggleRequested;
-            pauseMenu.RestartRequested += PauseMenu_RestartRequested;
+            //pauseMenu.RestartRequested += PauseMenu_RestartRequested;
         }
 
-        private void PauseMenu_RestartRequested(object sender, EventArgs e)
-        {
-            reloadSceneToRestartGame();
-        }
+        //private void PauseMenu_RestartRequested(object sender, EventArgs e)
+        //{
+        //    loadNewGame();
+        //}
 
         private void PauseMenu_ToggleRequested(object sender, EventArgs e)
         {
@@ -43,12 +44,11 @@ namespace Game.GameLoop
             toggleGameplayAndStagePreview(wasPaused);
         }
 
-        private void reloadSceneToRestartGame()
-        {
-            Time.timeScale = 1f;
-            Scene scene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(scene.buildIndex, LoadSceneMode.Single);
-        }
+        //private void loadNewGame()
+        //{
+        //    Time.timeScale = 1f;
+        //    SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        //}
 
         private void toggleGameplayAndStagePreview(bool wasPaused)
         {

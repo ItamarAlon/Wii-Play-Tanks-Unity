@@ -26,11 +26,6 @@ namespace Game.GameLoop
         private int aliveEnemiesCount;
         private int enemiesInCurrentStageCount;
 
-        public void LoadGame()
-        {
-            SceneManager.LoadScene("Game");
-        }
-
         public void BeginStage(GameObject def, bool firstTimeLoading)
         {
             if (firstTimeLoading)               
