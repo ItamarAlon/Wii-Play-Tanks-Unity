@@ -28,12 +28,30 @@ namespace Game.GameLoop
 
         void Awake()
         {
-            pauseMenu.ToggleRequested += PauseMenu_Toggled;
+            pauseMenu.ToggleRequested += PauseMenu_ToggleRequested;
+            pauseMenu.RestartRequested += PauseMenu_RestartRequested;
         }
 
-        private void PauseMenu_Toggled(object sender, EventArgs e)
+        private void PauseMenu_RestartRequested(object sender, EventArgs e)
+        {
+            reloadSceneToRestartGame();
+        }
+
+        private void PauseMenu_ToggleRequested(object sender, EventArgs e)
         {
             bool wasPaused = e as EventArgs<bool>;
+            toggleGameplayAndStagePreview(wasPaused);
+        }
+
+        private void reloadSceneToRestartGame()
+        {
+            Time.timeScale = 1f;
+            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(scene.buildIndex, LoadSceneMode.Single);
+        }
+
+        private void toggleGameplayAndStagePreview(bool wasPaused)
+        {
             stageManager.SetGameplayEnabled(!wasPaused, true);
             toggleStagePreview(!wasPaused);
         }

@@ -1,7 +1,3 @@
-// Auto-generated stubs for Wii Play Tanks
-// Generated: 2025-10-03T10:21:31.691001
-// You can safely replace any class body with the real implementation from the HTML guide.
-
 using UnityEngine;
 using Game.Gameplay.Projectiles;
 using UnityEngine.Pool;
@@ -20,6 +16,7 @@ namespace Game.Gameplay.Tanks.Shared
         [SerializeField] float cooldownSeconds = 0.25f;
         [SerializeField] int maxActive = 4;
         [SerializeField] bool isPlayer;
+        [field: SerializeField] public Color BulletTint { get; private set; } = Color.white;
 
         private bool isCooldownActive = false;
         private int active;
@@ -30,7 +27,7 @@ namespace Game.Gameplay.Tanks.Shared
         private void Awake()
         {
             _bulletPool = new ObjectPool<Bullet>(
-                createFunc: createBullet, 
+                createFunc: createBullet,
                 actionOnGet: activateWhenGettingBulletFromPool,
                 actionOnRelease: b => b.gameObject.SetActive(false),
                 actionOnDestroy: b => Destroy(b.gameObject),
@@ -38,6 +35,7 @@ namespace Game.Gameplay.Tanks.Shared
 
             _collider = GetComponentInParent<Collider2D>();
             BulletPrefab.MaxBounces = MaxBounces;
+            applyTintToPrefab();
         }
 
         public void TryFire(Vector2 dir)
@@ -102,6 +100,7 @@ namespace Game.Gameplay.Tanks.Shared
             Bullet bullet = Instantiate(BulletPrefab, Muzzle.position, Quaternion.identity);
             bullet.tag = isPlayer ? "Player" : "Enemy";
             bullet.SetOwner(this);
+            applyTintToBullet(bullet);
             return bullet;
         }
 
@@ -110,6 +109,7 @@ namespace Game.Gameplay.Tanks.Shared
             ignoreCollisionWithBullet(bullet);
             bullet.transform.position = Muzzle.position;
             bullet.gameObject.SetActive(true);
+            applyTintToBullet(bullet);
         }
 
         private void ignoreCollisionWithBullet(Bullet bullet)
@@ -121,6 +121,36 @@ namespace Game.Gameplay.Tanks.Shared
         private void OnDestroy()
         {
             DestroyBullets();
+        }
+
+        public void SetBulletTint(Color c)
+        {
+            BulletTint = c;
+            applyTintToPrefab();
+            applyTintToActive();
+        }
+
+        private void applyTintToPrefab()
+        {
+            if (BulletPrefab == null) return;
+            var sr = BulletPrefab.GetComponentInChildren<SpriteRenderer>(true);
+            if (sr == null) return;
+            float a = sr.color.a > 0f ? sr.color.a : 1f;
+            sr.color = new Color(BulletTint.r, BulletTint.g, BulletTint.b, a);
+        }
+
+        private void applyTintToBullet(Bullet b)
+        {
+            if (b == null) return;
+            var sr = b.GetComponentInChildren<SpriteRenderer>(true);
+            if (sr == null) return;
+            float a = sr.color.a > 0f ? sr.color.a : 1f;
+            sr.color = new Color(BulletTint.r, BulletTint.g, BulletTint.b, a);
+        }
+
+        private void applyTintToActive()
+        {
+            foreach (var b in activeBullets) applyTintToBullet(b);
         }
     }
 }
