@@ -363,7 +363,7 @@ public class TankMovementAI : EnemyAI
             if (to.sqrMagnitude > 0.0001f)
             {
                 Vector2 away = (-to).normalized;
-                //away = steerAwayFromWallIfBlocked(away);
+                away = steerAwayFromWallIfBlocked(away);
                 sum += away;
             }
         }

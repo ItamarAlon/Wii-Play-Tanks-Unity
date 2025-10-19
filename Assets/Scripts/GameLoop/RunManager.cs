@@ -26,6 +26,7 @@ namespace Game.GameLoop
         private int CurrentStageNum => CurrentStageIndex + 1;
         private bool allowStagePreview = true;
         private bool inStagePreview = false;
+        private bool gameEnded = false;
 
         public event EventHandler GameEnded;
 
@@ -90,6 +91,7 @@ namespace Game.GameLoop
 
         public void OnStageCleared()
         {
+            if (gameEnded) return;
             StageList[CurrentStageIndex].SetActive(false);
             CurrentStageIndex++;
             if (CurrentStageIndex >= StageList.Length)
@@ -154,6 +156,7 @@ namespace Game.GameLoop
             hud.Disable();
             gameOverMenu.Toggle();            
             gameOverMenu.SetKills(TotalKills);
+            gameEnded = true;
             OnGameEnded(EventArgs.Empty);
         }
 

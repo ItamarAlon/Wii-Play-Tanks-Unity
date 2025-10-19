@@ -20,7 +20,7 @@ namespace Game.Gameplay.Level
         [HideInInspector] public List<GameObject> EnemyInstances;
 
         private Vector2 initialPlayerPosition;
-        private List<(GameObject enemy, Vector2 position)> EnemyInstancesAndInitialPos 
+        private List<(GameObject enemy, Vector2 position)> enemyInstancesAndInitialPos 
             = new List<(GameObject, Vector2)>();
 
         public void Load(GameObject def)
@@ -36,7 +36,7 @@ namespace Game.Gameplay.Level
             PlayerInstance.transform.position = initialPlayerPosition;
             PlayerInstance.GetComponent<Health>().Revive();
 
-            foreach (var e in EnemyInstancesAndInitialPos)
+            foreach (var e in enemyInstancesAndInitialPos)
             {
                 e.enemy.transform.position = e.position;
                 e.enemy.GetComponent<Health>().Revive();
@@ -49,7 +49,7 @@ namespace Game.Gameplay.Level
         {
             DestroyAllBullets();
             EnemyInstances.Clear();
-            EnemyInstancesAndInitialPos.Clear();
+            enemyInstancesAndInitialPos.Clear();
         }
 
         public void DestroyAllBullets()
@@ -90,7 +90,7 @@ namespace Game.Gameplay.Level
             foreach (Transform tank in tanksParent)
             {
                 if (tank.CompareTag("Enemy"))
-                    EnemyInstancesAndInitialPos.Add((tank.gameObject, tank.position));
+                    enemyInstancesAndInitialPos.Add((tank.gameObject, tank.position));
                 else if (tank.CompareTag("Player"))
                 {
                     PlayerInstance = tank.gameObject;
@@ -98,7 +98,7 @@ namespace Game.Gameplay.Level
                 }
             }
 
-            EnemyInstances = EnemyInstancesAndInitialPos.Select(e => e.Item1).ToList();
+            EnemyInstances = enemyInstancesAndInitialPos.Select(e => e.Item1).ToList();
         }
 
     }

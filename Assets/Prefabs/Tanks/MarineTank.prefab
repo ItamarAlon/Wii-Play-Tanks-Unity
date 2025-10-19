@@ -144,7 +144,7 @@ MonoBehaviour:
   <MuzzleSpeed>k__BackingField: 7.6
   <MaxBounces>k__BackingField: 0
   <BulletTint>k__BackingField: {r: 0.046540834, g: 0, b: 0.3490566, a: 1}
-  cooldownSeconds: 1
+  cooldownSeconds: 1.33
   maxActive: 1
   isPlayer: 0
   killsOwnKind: 1
@@ -194,8 +194,8 @@ MonoBehaviour:
   EnemyBulletAwareness: 0
   PlayerMineAwareness: 0
   PlayerBulletAwareness: 40
-  SurvivalModeFlag: 1
-  Aggressiveness: -0.07
+  SurvivalModeFlag: 0
+  Aggressiveness: -0.1
   QueueCapacity: 4
   MaxSpeed: 0.02
   TurnSpeedDegPerFrame: 10.3132

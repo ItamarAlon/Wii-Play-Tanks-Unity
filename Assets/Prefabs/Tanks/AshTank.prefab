@@ -194,7 +194,7 @@ MonoBehaviour:
   EnemyBulletAwareness: 0
   PlayerMineAwareness: 0
   PlayerBulletAwareness: 40
-  SurvivalModeFlag: 1
+  SurvivalModeFlag: 0
   Aggressiveness: 0.08
   QueueCapacity: 4
   MaxSpeed: 0.02
@@ -230,8 +230,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
-  turretAngleRangeOffset: 40
-  turretTurnSpeedDeg: 0
+  turretAngleRangeOffset: 20
+  turretTurnSpeedDeg: 1.145
   turretTargetTimer: 90
   alwaysEnabled: 1
 --- !u!114 &6375145360895304136

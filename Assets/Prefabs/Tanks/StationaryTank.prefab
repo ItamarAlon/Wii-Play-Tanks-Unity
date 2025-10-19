@@ -160,7 +160,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
-  turretAngleRangeOffset: 170
+  turretAngleRangeOffset: 70
   turretTurnSpeedDeg: 1.145
   turretTargetTimer: 120
   alwaysEnabled: 1
