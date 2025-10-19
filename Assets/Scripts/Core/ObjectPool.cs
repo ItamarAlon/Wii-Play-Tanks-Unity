@@ -76,7 +76,6 @@ namespace Game.Core
                     UnityEngine.Object.Destroy(uo);
             }
             active.Clear();
-            //pool.Clear();
         }
 
         /// <summary>Clears the pool of inactive objects (leaves active ones alone).</summary>

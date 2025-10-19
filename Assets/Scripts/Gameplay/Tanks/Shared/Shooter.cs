@@ -30,7 +30,7 @@ namespace Game.Gameplay.Tanks.Shared
                 createFunc: createBullet,
                 actionOnGet: activateWhenGettingBulletFromPool,
                 actionOnRelease: b => b.gameObject.SetActive(false),
-                actionOnDestroy: b => Destroy(b.gameObject),
+                //actionOnDestroy: b => Destroy(b.gameObject),
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
@@ -104,7 +104,7 @@ namespace Game.Gameplay.Tanks.Shared
             ignoreCollisionWithBullet(bullet);
             bullet.transform.position = Muzzle.position;
             bullet.gameObject.SetActive(true);
-            applyTintToBullet(bullet);
+            //applyTintToBullet(bullet);
         }
 
         private void ignoreCollisionWithBullet(Bullet bullet)
