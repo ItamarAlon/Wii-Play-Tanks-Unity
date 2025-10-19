@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 4233985617811861212}
   - component: {fileID: 4139980697627204812}
   m_Layer: 10
-  m_Name: Brick
+  m_Name: StageEnvironment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

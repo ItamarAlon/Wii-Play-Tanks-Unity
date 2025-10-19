@@ -13,6 +13,7 @@ namespace Game.UI
         public event EventHandler RestartRequested;
         public event EventHandler MainMenuRequested;
         public event EventHandler QuitGameRequested;
+        public bool AllowedPause { get; set; } = true;
 
         void Awake()
         {
@@ -27,12 +28,25 @@ namespace Game.UI
 
         public void Toggle()
         {
+            if (!AllowedPause) return;
             paused = !paused;
             if (panel) 
                 panel.SetActive(paused);
             Time.timeScale = paused ? 0f : 1f;
             OnToggleRequested(paused);
         }
+
+        public void Disable()
+        {
+            AllowedPause = false;
+        }
+
+        //Buttons//
+        public void OnPause() => Toggle();
+        public void OnResume() => Toggle();
+        public void OnRestart() => OnRestartRequested(EventArgs.Empty);
+        public void OnQuitGame() => OnQuitGameRequested(EventArgs.Empty);
+        public void OnMainMenu() => OnMainMenuRequested(EventArgs.Empty);
 
         protected virtual void OnToggleRequested(EventArgs<bool> e)
         {
@@ -50,16 +64,5 @@ namespace Game.UI
         {
             QuitGameRequested?.Invoke(this, e);
         }
-
-        //Buttons//
-        public void OnPause() => Toggle();
-        public void OnResume() => Toggle();
-        public void OnRestart() => OnRestartRequested(EventArgs.Empty);
-        public void OnQuitGame() => OnQuitGameRequested(EventArgs.Empty);
-        public void OnMainMenu() => OnMainMenuRequested(EventArgs.Empty);
-        //{
-        //    Time.timeScale = 1f;
-        //    SceneManager.LoadScene("Title");
-        //}
     }
 }

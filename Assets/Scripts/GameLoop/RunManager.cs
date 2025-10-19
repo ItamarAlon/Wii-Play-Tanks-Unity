@@ -17,6 +17,7 @@ namespace Game.GameLoop
         [SerializeField] StageManager stageManager;
         [SerializeField] StageBanner banner;
         [SerializeField] PauseMenu pauseMenu;
+        [SerializeField] GameOverMenu gameOverMenu;
 
         public int CurrentLives { get; private set; }
         public int TotalKills { get; private set; }
@@ -55,7 +56,10 @@ namespace Game.GameLoop
             LoadStage(CurrentStageIndex, true);
             RefreshHUD();
 
-            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), LayerMask.NameToLayer("Holes"));
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), 
+                LayerMask.NameToLayer("Holes"));
+
+            //Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Bullet"), LayerMask.NameToLayer("Tank"));
         }
 
         private void deactivateAllStages()
@@ -103,7 +107,7 @@ namespace Game.GameLoop
             currentStage.SetActive(true);
             stageManager.BeginStage(currentStage, firstTimeLoading);
 
-            StartCoroutine(StageRoutine());
+            StartCoroutine(stageRoutine());
         }
 
         private void RefreshHUD()
@@ -122,7 +126,7 @@ namespace Game.GameLoop
                 allowStagePreview = !allowStagePreview;
         }
 
-        private IEnumerator StageRoutine()
+        private IEnumerator stageRoutine()
         {
             stageManager.SetGameplayEnabled(false);
             inStagePreview = true;
@@ -146,7 +150,10 @@ namespace Game.GameLoop
 
         private void endGame()
         {
-            General.LoadMainMenu();
+            pauseMenu.Disable();
+            hud.Disable();
+            gameOverMenu.Toggle();            
+            gameOverMenu.SetKills(TotalKills);
             OnGameEnded(EventArgs.Empty);
         }
 

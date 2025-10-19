@@ -70,9 +70,9 @@ namespace Game.Core
             {
                 var o = active[i];
                 actionOnDestroy?.Invoke(o);
-                if (o is Component c) 
+                if (o != null && o is Component c) 
                     UnityEngine.Object.Destroy(c.gameObject);
-                else if (o is UnityEngine.Object uo) 
+                else if (o != null && o is UnityEngine.Object uo) 
                     UnityEngine.Object.Destroy(uo);
             }
             active.Clear();

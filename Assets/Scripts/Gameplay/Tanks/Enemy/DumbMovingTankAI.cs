@@ -84,6 +84,11 @@ public class TankMovementAI : EnemyAI
         {
             enable = value;
             agent.enabled = value;
+            if (enable)
+            {
+                StopCoroutine(movementOpportunityRoutine());
+                StartCoroutine(movementOpportunityRoutine());
+            }
         }
     }
 
@@ -96,8 +101,6 @@ public class TankMovementAI : EnemyAI
     [Header("Optional: Player Target (for aggressiveness bias)")]
     public Transform playerTarget;
 
-    // === Internal state (unchanged) ===
-    private bool allowedRandomTurn = true;
 
     private MovementQueue movementQueue;
 
@@ -159,13 +162,6 @@ public class TankMovementAI : EnemyAI
         }
     }
 
-    private IEnumerator randomTurnCooldownRoutine(float waitTimeSeconds)
-    {
-        allowedRandomTurn = false;
-        yield return new WaitForSeconds(waitTimeSeconds);
-        allowedRandomTurn = true;
-    }
-
     private void calculateNewTurn()
     {
         handleMovementOpportunityCadence();
@@ -201,45 +197,6 @@ public class TankMovementAI : EnemyAI
         wantedMove = MoveRequest.None;
         return movementQueue.NextAngle;
     }
-    //private void ProcessTurnTargetPriority()
-    //{
-    //    if (mineMovementOverrideFlag)
-    //    {
-    //        mineMovementOverrideFlag = false;
-    //        return;
-    //    }
-    //
-    //    if (survivalModeFlag)
-    //    {
-    //        turnTargetAngleDeg = computeSurvivalEscapeAngle();
-    //        survivalModeFlag = false;
-    //    }
-    //    else if (largeTurnFlag)
-    //    {
-    //        MovementQueue.QueueSource src = MovementQueue.QueueSource.LargeTurn;
-    //        if (movementQueue.CanEnterNewValues(src))
-    //        {
-    //            enterAnglesForLargeTurnToQueue();
-    //        }
-    //
-    //        largeTurnFlag = false;
-    //        sequenceTurnFlag = true; // consume next queued mini-turn
-    //    }
-    //    else if (randomTurnFlag)
-    //    {
-    //        MovementQueue.QueueSource src = MovementQueue.QueueSource.RandomTurn;
-    //        enterAnglesForRandomTurnToQueue();
-    //        randomTurnFlag = false;
-    //        sequenceTurnFlag = true;
-    //    }
-    //
-    //    if (sequenceTurnFlag)
-    //    {
-    //        turnTargetAngleDeg = movementQueue.NextAngle.Value;
-    //        sequenceTurnFlag = false;
-    //    }
-    //    //printLog("movementQueue count: " + movementQueue.Count);
-    //}
 
     private float computeSurvivalEscapeAngle()
     {
@@ -272,8 +229,8 @@ public class TankMovementAI : EnemyAI
         }
         else
         {
-            turnTargetAngleDeg = getOppositeFacingAngleDeg();
-            movementQueue.ClearQueue();
+            enqueueMiniTurnsRelative(getOppositeFacingAngleDeg(),
+                MovementQueue.QueueSource.LargeTurn);
         }
     }
 
@@ -415,7 +372,7 @@ public class TankMovementAI : EnemyAI
             if (to.sqrMagnitude > 0.0001f)
             {
                 Vector2 away = (-to).normalized;
-                away = steerAwayFromWallIfBlocked(away);
+                //away = steerAwayFromWallIfBlocked(away);
                 sum += away;
             }
         }
@@ -477,7 +434,8 @@ public class TankMovementAI : EnemyAI
     {
         Vector3 start = hull.position;
         Vector3 end = start + hull.up * lookingDistance;
-        return agent.Raycast(end, out _);
+        return Physics2D.Raycast(start, hull.up, lookingDistance, LayerMask.GetMask("Walls"));
+        //return agent.Raycast(end, out _);
     }
 
     bool IsThereObstacleAhead()
@@ -485,11 +443,11 @@ public class TankMovementAI : EnemyAI
         return IsThereObstacleAhead(getlookDistance());
     }
 
-    (bool leftOpen, bool rightOpen) ProbeLeftRightForLargeTurn(float distanceUnity)
+    (bool leftOpen, bool rightOpen) ProbeLeftRightForLargeTurn(float distance)
     {
         Vector3 start = hull.position;
-        Vector3 leftEnd = start + (Vector3)Rotate90(hull.up, +1) * distanceUnity;
-        Vector3 rightEnd = start + (Vector3)Rotate90(hull.up, -1) * distanceUnity;
+        Vector3 leftEnd = start + (Vector3)Rotate90(hull.up, +1) * distance;
+        Vector3 rightEnd = start + (Vector3)Rotate90(hull.up, -1) * distance;
 
         bool leftBlocked = agent.Raycast(leftEnd, out _);
         bool rightBlocked = agent.Raycast(rightEnd, out _);

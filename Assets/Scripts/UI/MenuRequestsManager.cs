@@ -44,6 +44,13 @@ public sealed class MenuRequestsManager : MonoBehaviour
         pauseMenu.RestartRequested += PauseMenu_RestartRequested;
         pauseMenu.MainMenuRequested += PauseMenu_MainMenuRequested;
         pauseMenu.QuitGameRequested += PauseMenu_QuitGameRequested;
+
+        GameOverMenu gameOverMenu = FindFirstObjectByType<GameOverMenu>();
+        if (!gameOverMenu) return;
+
+        gameOverMenu.RestartRequested += GameOverMenu_RestartRequested;
+        gameOverMenu.MainMenuRequested += GameOverMenu_MainMenuRequested;
+        gameOverMenu.QuitGameRequested += GameOverMenu_QuitGameRequested;
     }
 
     private void assignToEventsInTitleScene()
@@ -53,6 +60,21 @@ public sealed class MenuRequestsManager : MonoBehaviour
 
         titleMenu.StartGameRequested += TitleMenu_StartGameRequested;
         titleMenu.QuitGameRequested += TitleMenu_QuitGameRequested;
+    }
+
+    private void GameOverMenu_QuitGameRequested(object sender, EventArgs e)
+    {
+        General.QuitGame();
+    }
+
+    private void GameOverMenu_MainMenuRequested(object sender, EventArgs e)
+    {
+        General.LoadMainMenu();
+    }
+
+    private void GameOverMenu_RestartRequested(object sender, EventArgs e)
+    {
+        General.LoadNewGame();
     }
 
     private void PauseMenu_QuitGameRequested(object sender, EventArgs e)

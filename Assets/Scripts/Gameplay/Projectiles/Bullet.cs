@@ -9,6 +9,7 @@ namespace Game.Gameplay.Projectiles
     public class Bullet : MonoBehaviour
     {
         public int MaxBounces { get; set; } = 1;
+        public bool KillsOwnKind { private get; set; } = true;
 
         private Rigidbody2D rb;
         private int _bounces;
@@ -30,17 +31,15 @@ namespace Game.Gameplay.Projectiles
         void OnCollisionEnter2D(Collision2D col)
         {
             string layer = LayerMask.LayerToName(col.collider.gameObject.layer);
-            // Hit a tank or a mine ? kill & despawn
             if (layer == "Tank" || layer == "Bullet" || layer == "Mines")
             {
-                var h = col.collider.GetComponentInParent<Health>();
-                if (h)
-                    h.Kill();
+                var health = col.collider.GetComponentInParent<Health>();
+                if (health && extraCheck(health))
+                    health.Kill();
                 Despawn();
                 return;
             }
 
-            // Ricochet on walls
             if (layer == "Walls")
             {
                 _bounces++;
@@ -49,6 +48,13 @@ namespace Game.Gameplay.Projectiles
                 return;
             }
             Despawn();
+        }
+
+        private bool extraCheck(Health hit)
+        {
+            if (gameObject.CompareTag(hit.tag))
+                return KillsOwnKind;
+            return true;
         }
 
         void Despawn()

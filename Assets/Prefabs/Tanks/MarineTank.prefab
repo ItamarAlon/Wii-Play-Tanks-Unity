@@ -143,10 +143,11 @@ MonoBehaviour:
   <BulletPrefab>k__BackingField: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
   <MuzzleSpeed>k__BackingField: 7.6
   <MaxBounces>k__BackingField: 0
+  <BulletTint>k__BackingField: {r: 0.046540834, g: 0, b: 0.3490566, a: 1}
   cooldownSeconds: 0.25
   maxActive: 1
   isPlayer: 0
-  <BulletTint>k__BackingField: {r: 0.046540834, g: 0, b: 0.3490566, a: 1}
+  killsOwnKind: 1
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0

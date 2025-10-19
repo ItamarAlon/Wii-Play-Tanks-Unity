@@ -15,8 +15,8 @@ namespace Assets.Scripts.Gameplay.Tanks.Enemy
 
         private Beam[] beams;
         private int numOfBeams;
-        public bool PlayerInSight => beams.Any(beam => beam.PlayerInSight);
-        public bool EnemyInSight => beams.Any(beam => beam.EnemyInSight);
+        public bool PlayerInSight => beams != null && beams.Any(beam => beam.PlayerInSight);
+        public bool EnemyInSight => beams != null && beams.Any(beam => beam.EnemyInSight);
         public event EventHandler ShootingOpportunityFound;
 
         void OnValidate()

@@ -13,11 +13,12 @@ namespace Game.Gameplay.Tanks.Shared
         [field: SerializeField] public Bullet BulletPrefab { get; private set; }
         [field: SerializeField] public float MuzzleSpeed { get; private set; } = 3.76f;
         [field: SerializeField] public int MaxBounces { get; private set; } = 2;
+        [field: SerializeField] public Color BulletTint { get; private set; } = Color.white;
 
         [SerializeField] float cooldownSeconds = 0.25f;
         [SerializeField] int maxActive = 4;
         [SerializeField] bool isPlayer;
-        [field: SerializeField] public Color BulletTint { get; private set; } = Color.white;
+        [SerializeField] bool killsOwnKind = true;
 
         private bool isCooldownActive = false;
         private int active;
@@ -30,11 +31,12 @@ namespace Game.Gameplay.Tanks.Shared
                 createFunc: createBullet,
                 actionOnGet: activateWhenGettingBulletFromPool,
                 actionOnRelease: b => b.gameObject.SetActive(false),
-                //actionOnDestroy: b => Destroy(b.gameObject),
+                actionOnDestroy: b => Destroy(b.gameObject),
                 maxSize: maxActive);
 
             _collider = GetComponentInParent<Collider2D>();
             BulletPrefab.MaxBounces = MaxBounces;
+            BulletPrefab.KillsOwnKind = killsOwnKind;
             applyTintToPrefab();
         }
 
@@ -104,7 +106,6 @@ namespace Game.Gameplay.Tanks.Shared
             ignoreCollisionWithBullet(bullet);
             bullet.transform.position = Muzzle.position;
             bullet.gameObject.SetActive(true);
-            //applyTintToBullet(bullet);
         }
 
         private void ignoreCollisionWithBullet(Bullet bullet)

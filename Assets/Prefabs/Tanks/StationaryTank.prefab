@@ -158,10 +158,11 @@ MonoBehaviour:
   <BulletPrefab>k__BackingField: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
   <MuzzleSpeed>k__BackingField: 3.76
   <MaxBounces>k__BackingField: 1
+  <BulletTint>k__BackingField: {r: 0.46226418, g: 0.30604988, b: 0.20060521, a: 1}
   cooldownSeconds: 0.25
   maxActive: 1
   isPlayer: 0
-  <BulletTint>k__BackingField: {r: 0.46226418, g: 0.30604988, b: 0.20060521, a: 1}
+  killsOwnKind: 1
 --- !u!114 &3778763086416148957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +178,7 @@ MonoBehaviour:
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
   word29_TurretAngleOffset: 170
-  word39_TurretTurnSpeedRadPerFrame: 0.01
+  word39_TurretTurnSpeedRadPerFrame: 0.02
   word40_TurretTargetTimer: 120
   alwaysEnabled: 1
 --- !u!114 &81903426926603415

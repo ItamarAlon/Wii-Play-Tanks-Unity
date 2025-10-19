@@ -143,7 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shooter: {fileID: 4634876464340005560}
   turret: {fileID: 4784823741860575744}
-  minePrefab: {fileID: 5545409872264800293, guid: 08c7a007e6b34e64296f1b296a1e270e, type: 3}
+  minePrefab: {fileID: 0}
   fireKey: 323
   mineKey: 101
 --- !u!114 &2635765008753344097
@@ -174,10 +174,11 @@ MonoBehaviour:
   <BulletPrefab>k__BackingField: {fileID: 657623285059520086, guid: 0ff25b0ea23980445bfd85cd4ea1d6ce, type: 3}
   <MuzzleSpeed>k__BackingField: 3.76
   <MaxBounces>k__BackingField: 1
+  <BulletTint>k__BackingField: {r: 0.21715914, g: 0.40260157, b: 0.5754717, a: 1}
   cooldownSeconds: 0.25
   maxActive: 4
   isPlayer: 1
-  <BulletTint>k__BackingField: {r: 0.21715914, g: 0.40260157, b: 0.5754717, a: 1}
+  killsOwnKind: 1
 --- !u!114 &-4896332225278636268
 MonoBehaviour:
   m_ObjectHideFlags: 0
