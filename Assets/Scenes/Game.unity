@@ -167,11 +167,11 @@ MonoBehaviour:
   startingLives: 3
   previewTimeSeconds: 3
   StageList:
-  - {fileID: 1420376634}
   - {fileID: 1386038922}
-  - {fileID: 912120337}
-  - {fileID: 1762493269}
   - {fileID: 1333321127}
+  - {fileID: 1762493269}
+  - {fileID: 912120337}
+  - {fileID: 1420376634}
   hud: {fileID: 642477475}
   stageManager: {fileID: 2876292}
   banner: {fileID: 642477473}
@@ -1095,7 +1095,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &503253397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1415,7 +1415,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -4, y: -237}
+  m_AnchoredPosition: {x: -7, y: -263.99}
   m_SizeDelta: {x: -669.9169, y: -527.98}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &541273417
@@ -3742,7 +3742,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.34500003, y: 1}
-  m_AnchoredPosition: {x: -101.7, y: -238.5}
+  m_AnchoredPosition: {x: -102, y: -260.78}
   m_SizeDelta: {x: -260.2061, y: -521.5667}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1609307460

@@ -6,7 +6,6 @@ using UnityEngine;
 using System.Collections;
 using Game.Gameplay.Level;
 using Game.Gameplay.Tanks.Shared;
-using Game.Gameplay.Tanks.Enemy;
 using Game.UI;
 using Game.Gameplay.Effects;
 using UnityEngine.SceneManagement;

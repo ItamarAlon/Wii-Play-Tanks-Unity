@@ -21,8 +21,17 @@ namespace Game.UI
             if (killsText) killsText.gameObject.SetActive(false);
         }
 
-        public void SetLives(int livesNum) { if (livesText) livesText.text = livesNum.ToString(); }
-        public void SetStage(int stageNum) { if (stageText) stageText.text = $"Stage {stageNum}"; }
-        public void SetKills(int killsNum) { if (killsText) killsText.text = killsNum.ToString(); }
+        public void SetLives(int livesNum)
+        { 
+            if (livesText) livesText.text = $"Lives {livesNum}"; 
+        }
+        public void SetStage(int stageNum) 
+        { 
+            if (stageText) stageText.text = $"Stage {stageNum}"; 
+        }
+        public void SetKills(int killsNum)
+        { 
+            if (killsText) killsText.text = killsNum.ToString(); 
+        }
     }
 }
