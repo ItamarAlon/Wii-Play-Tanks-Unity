@@ -4,6 +4,7 @@ using Game.Gameplay.Level;
 using Game.UI;
 using System.Collections;
 using System;
+using Assets.Scripts.Core;
 
 namespace Game.GameLoop
 {
@@ -12,7 +13,6 @@ namespace Game.GameLoop
         [SerializeField] private int startingLives = 3;
         [SerializeField] private float previewTimeSeconds = 3f;
         [SerializeField] GameObject[] StageList;
-        //public LevelLoader levelLoader;
         [SerializeField] HUDController hud;
         [SerializeField] StageManager stageManager;
         [SerializeField] StageBanner banner;
@@ -26,29 +26,19 @@ namespace Game.GameLoop
         private bool allowStagePreview = true;
         private bool inStagePreview = false;
 
+        public event EventHandler GameEnded;
+
         void Awake()
         {
             TitleMenu titleMenu = FindFirstObjectByType<TitleMenu>();
             pauseMenu.ToggleRequested += PauseMenu_ToggleRequested;
-            //pauseMenu.RestartRequested += PauseMenu_RestartRequested;
         }
-
-        //private void PauseMenu_RestartRequested(object sender, EventArgs e)
-        //{
-        //    loadNewGame();
-        //}
 
         private void PauseMenu_ToggleRequested(object sender, EventArgs e)
         {
             bool wasPaused = e as EventArgs<bool>;
             toggleGameplayAndStagePreview(wasPaused);
         }
-
-        //private void loadNewGame()
-        //{
-        //    Time.timeScale = 1f;
-        //    SceneManager.LoadScene("Game", LoadSceneMode.Single);
-        //}
 
         private void toggleGameplayAndStagePreview(bool wasPaused)
         {
@@ -87,7 +77,7 @@ namespace Game.GameLoop
             CurrentLives--;
             if (CurrentLives <= 0)
             {
-                SceneManager.LoadScene("Title");
+                endGame();
                 return;
             }
             LoadStage(CurrentStageIndex, false);
@@ -100,7 +90,7 @@ namespace Game.GameLoop
             CurrentStageIndex++;
             if (CurrentStageIndex >= StageList.Length)
             {
-                SceneManager.LoadScene("Title");
+                endGame();
                 return;
             }
             LoadStage(CurrentStageIndex, true);
@@ -152,6 +142,17 @@ namespace Game.GameLoop
             inStagePreview = false;
             allowStagePreview = true;
             stageManager.SetGameplayEnabled(true);
+        }
+
+        private void endGame()
+        {
+            General.LoadMainMenu();
+            OnGameEnded(EventArgs.Empty);
+        }
+
+        protected virtual void OnGameEnded(EventArgs e)
+        {
+            GameEnded?.Invoke(this, e);
         }
     }
 }

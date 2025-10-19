@@ -32,7 +32,7 @@ namespace Game.Gameplay.Level
 
         public GameObject Reload()
         {
-            RemoveAllBullets();
+            ReleaseAllBullets();
             PlayerInstance.transform.position = initialPlayerPosition;
             PlayerInstance.GetComponent<Health>().Revive();
 
@@ -47,23 +47,40 @@ namespace Game.Gameplay.Level
 
         public void Clear()
         {
-            RemoveAllBullets();
+            DestroyAllBullets();
             EnemyInstances.Clear();
             EnemyInstancesAndInitialPos.Clear();
         }
 
-        public void RemoveAllBullets()
+        public void DestroyAllBullets()
         {
-            if (PlayerInstance)
-                removeAllTankBullets(PlayerInstance);
-            EnemyInstances?.ForEach(removeAllTankBullets);
+            invokeOnAllTanks(destroyAllTankBullets);
         }
 
-        private void removeAllTankBullets(GameObject tank)
+        public void ReleaseAllBullets()
+        {
+            invokeOnAllTanks(releaseAllTankBullets);
+        }
+
+        private void invokeOnAllTanks(Action<GameObject> action)
+        {
+            if (PlayerInstance)
+                action.Invoke(PlayerInstance);
+            EnemyInstances?.ForEach(action.Invoke);
+        }
+
+        private void destroyAllTankBullets(GameObject tank)
         {
             Shooter shooter = tank.GetComponent<Shooter>();
             if (shooter)
-                shooter.ClearBullets();
+                shooter.DestroyBullets();
+        }
+
+        private void releaseAllTankBullets(GameObject tank)
+        {
+            Shooter shooter = tank.GetComponent<Shooter>();
+            if (shooter)
+                shooter.ReleaseBullets();
         }
 
         private void assignAllTanks(GameObject stageInstance)

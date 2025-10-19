@@ -3,6 +3,7 @@ using Game.Gameplay.Projectiles;
 using UnityEngine.Pool;
 using System.Collections.Generic;
 using System.Collections;
+using Game.Core;
 
 namespace Game.Gameplay.Tanks.Shared
 {
@@ -21,12 +22,11 @@ namespace Game.Gameplay.Tanks.Shared
         private bool isCooldownActive = false;
         private int active;
         private Collider2D _collider;
-        private ObjectPool<Bullet> _bulletPool;
-        private List<Bullet> activeBullets = new List<Bullet>();
+        private ObjectPoolWrapper<Bullet> bulletPool;
 
         private void Awake()
         {
-            _bulletPool = new ObjectPool<Bullet>(
+            bulletPool = new ObjectPoolWrapper<Bullet>(
                 createFunc: createBullet,
                 actionOnGet: activateWhenGettingBulletFromPool,
                 actionOnRelease: b => b.gameObject.SetActive(false),
@@ -44,8 +44,7 @@ namespace Game.Gameplay.Tanks.Shared
             if (active >= maxActive) return;
             if (!BulletPrefab || !Muzzle) return;
 
-            Bullet bullet = _bulletPool.Get();
-            activeBullets.Add(bullet);
+            Bullet bullet = bulletPool.Get();
 
             bullet.Launch(dir.normalized * MuzzleSpeed);
             active++;
@@ -75,23 +74,19 @@ namespace Game.Gameplay.Tanks.Shared
             if (active > 0)
             {
                 active--;
-                _bulletPool.Release(bullet);
-                activeBullets.Remove(bullet);
+                bulletPool.Release(bullet);
             }
         }
 
         public void DestroyBullets()
         {
-            activeBullets.ForEach(bullet => Destroy(bullet.gameObject));
-            activeBullets.Clear();
-            _bulletPool.Clear();
+            bulletPool.DestroyAll();
             active = 0;
         }
 
-        public void ClearBullets()
+        public void ReleaseBullets()
         {
-            activeBullets.ForEach(_bulletPool.Release);
-            activeBullets.Clear();
+            bulletPool.ReleaseAllActive();
             active = 0;
         }
 
@@ -127,7 +122,6 @@ namespace Game.Gameplay.Tanks.Shared
         {
             BulletTint = c;
             applyTintToPrefab();
-            applyTintToActive();
         }
 
         private void applyTintToPrefab()
@@ -146,11 +140,6 @@ namespace Game.Gameplay.Tanks.Shared
             if (sr == null) return;
             float a = sr.color.a > 0f ? sr.color.a : 1f;
             sr.color = new Color(BulletTint.r, BulletTint.g, BulletTint.b, a);
-        }
-
-        private void applyTintToActive()
-        {
-            foreach (var b in activeBullets) applyTintToBullet(b);
         }
     }
 }

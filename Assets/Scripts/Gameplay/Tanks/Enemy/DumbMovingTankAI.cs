@@ -148,7 +148,7 @@ public class TankMovementAI : EnemyAI
 
     private IEnumerator movementOpportunityRoutine()
     {
-        while (true)
+        while (Enable)
         {
             int randomTimer = pickNewRandomTurningValue();
             for (int i = 0; i < randomTimer; i++)

@@ -1,3 +1,4 @@
+using Assets.Scripts.Core;
 using Game.UI;
 using System;
 using UnityEngine;
@@ -37,7 +38,6 @@ public sealed class MenuRequestsManager : MonoBehaviour
 
     private void assignToEventsInGameScene()
     {
-        if (assignedToGameSceneEvents) return;
         PauseMenu pauseMenu = FindFirstObjectByType<PauseMenu>();
         if (!pauseMenu) return;
 
@@ -48,53 +48,36 @@ public sealed class MenuRequestsManager : MonoBehaviour
 
     private void assignToEventsInTitleScene()
     {
-        if (assignedToTitleSceneEvents) return;
         TitleMenu titleMenu = FindFirstObjectByType<TitleMenu>();
         if (!titleMenu) return;
+
         titleMenu.StartGameRequested += TitleMenu_StartGameRequested;
         titleMenu.QuitGameRequested += TitleMenu_QuitGameRequested;
     }
 
     private void PauseMenu_QuitGameRequested(object sender, EventArgs e)
     {
-        quit();
+        General.QuitGame();
     }
 
     private void PauseMenu_MainMenuRequested(object sender, EventArgs e)
     {
-        loadMainMenu();
+        General.LoadMainMenu();
     }
 
     private void PauseMenu_RestartRequested(object sender, EventArgs e)
     {
-        loadNewGame();
+        General.LoadNewGame();
     }
 
     private void TitleMenu_StartGameRequested(object sender, EventArgs e)
     {
-        loadNewGame();
+        General.LoadNewGame();
     }
 
     private void TitleMenu_QuitGameRequested(object sender, EventArgs e)
     {
-        quit();
-    }
-
-    private static void loadMainMenu()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("Title", LoadSceneMode.Single);
-    }
-
-    private void loadNewGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
-    }
-
-    private void quit()
-    {
-        Application.Quit();
+        General.QuitGame();
     }
 }
 
