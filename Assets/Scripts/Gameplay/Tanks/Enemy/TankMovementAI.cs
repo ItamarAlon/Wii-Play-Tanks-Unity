@@ -1,10 +1,7 @@
 ﻿using Assets.Scripts.Core;
 using Assets.Scripts.Gameplay.Tanks.Enemy;
-using NUnit.Framework.Internal;
-using PlasticPipe.PlasticProtocol.Messages;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.AI;
 
