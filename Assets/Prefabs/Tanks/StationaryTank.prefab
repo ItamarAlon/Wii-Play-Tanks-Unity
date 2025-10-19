@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 459607062893442421}
   - component: {fileID: 697450141309976428}
   - component: {fileID: 6156587957796854439}
-  - component: {fileID: 3608384252962551522}
   - component: {fileID: 2635765008753344097}
   - component: {fileID: 4634876464340005560}
   - component: {fileID: 3778763086416148957}
@@ -114,22 +113,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &3608384252962551522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 290090536791198282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97080ee0fc9c4bb4dad31ee86c7f3163, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hullVisual: {fileID: 0}
-  moveSpeed: 0
-  accel: 0
-  rotationSpeed: 0
 --- !u!114 &2635765008753344097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,7 +145,7 @@ MonoBehaviour:
   cooldownSeconds: 0.25
   maxActive: 1
   isPlayer: 0
-  killsOwnKind: 1
+  killsOwnKind: 0
 --- !u!114 &3778763086416148957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,9 +160,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
-  word29_TurretAngleOffset: 170
-  word39_TurretTurnSpeedRadPerFrame: 0.02
-  word40_TurretTargetTimer: 120
+  turretAngleRangeOffset: 170
+  turretTurnSpeedDeg: 1.145
+  turretTargetTimer: 120
   alwaysEnabled: 1
 --- !u!114 &81903426926603415
 MonoBehaviour:

@@ -8,9 +8,6 @@ using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// Wii Play Tanks - Dumbest Moving Tank (Movement-Only AI) – refactor only (behavior unchanged)
-/// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 public class TankMovementAI : EnemyAI
 {
@@ -21,60 +18,58 @@ public class TankMovementAI : EnemyAI
 
     [Tooltip("Units: internal-units → Unity units scale. (PDF uses internal units; a block = 35.0 units).")]
     public float internalUnitsToUnity = 1f;
-
-    [Tooltip("Simulation FPS used to convert per-frame PDF values to Unity time.")]
-    public float simulationFps = 60f;
+    private float offset = 60f;
 
     [Header("Words 11–15 (Movement Timers & Turn Randomness)")]
     [Tooltip("Word 11 – Tank Acceleration Value (internal units per frame).")]
-    public float word11_Accel = 0.3f;
+    public float Acceleration = 0.3f;
 
     [Tooltip("Word 12 – Tank Deceleration Multiplier (0..1; 0 = instant stop).")]
-    public float word12_DecelMul = 0.6f;
+    public float DecelerationMultiplier = 0.6f;
 
     [Tooltip("Word 13 – Random Turn Max Angle (degrees).")]
-    public float word13_RandomTurnMaxAngle = 30f;
+    public float RandomTurnMaxAngle = 30f;
 
     [Tooltip("Word 14 – Random Timer Boundary A (Movement) (frames).")]
-    public int word14_TimerA = 15;
+    public int TimerA = 15;
 
     [Tooltip("Word 15 – Random Timer Boundary B (Movement) (frames).")]
-    public int word15_TimerB = 10;
+    public int TimerB;
 
     [Header("Words 16–21 (Survival & Aggressiveness)")]
     [Tooltip("Word 16 – AI Mine Awareness (radius, internal units).")]
-    public float word16_AIMineAwareness = 120f;
+    public float EnemyMineAwareness = 120f;
 
     [Tooltip("Word 17 – AI Bullet Awareness (radius, internal units).")]
-    public float word17_AIBulletAwareness = 120f;
+    public float EnemyBulletAwareness = 120f;
 
     [Tooltip("Word 18 – Player Mine Awareness (radius, internal units).")]
-    public float word18_PlayerMineAwareness = 0f;
+    public float PlayerMineAwareness = 0f;
 
     [Tooltip("Word 19 – Player Bullet Awareness (radius, internal units).")]
-    public float word19_PlayerBulletAwareness = 40f;
+    public float PlayerBulletAwareness = 40f;
 
     [Tooltip("Word 20 – Survival Mode Activity Flag (nonzero enables).")]
-    public int word20_SurvivalModeFlag = 1;
+    public bool SurvivalModeFlag = true;
 
     [Tooltip("Word 21 – Tank Aggressiveness Bias (0..1; 0=no bias, 1=always bias towards player).")]
-    [Range(0f, 1f)] public float word21_Aggressiveness = 0.03f;
+    [Range(-1f, 1f)] public float Aggressiveness = 0.03f;
 
     [Header("Words 22–28 (Queueing, Speed, Turn, Obstacle Awareness)")]
     [Tooltip("Word 22 – Total Queueing Movements Value (1..10 typical).")]
-    [Range(1, 10)] public int word22_QueueCount = 4;
+    [Range(1, 10)] public int QueueCapacity = 4;
 
     [Tooltip("Word 23 – Tank Max Speed (internal units per frame).")]
-    public float word23_MaxSpeed = 1.2f;
+    public float MaxSpeed = 1.2f;
 
-    [Tooltip("Word 26 – Tank Turn Speed (radians per frame).")]
-    public float word26_TurnSpeedRadPerFrame = 0.08f;
+    [Tooltip("Word 26 – Tank Turn Speed (degrees per frame).")]
+    public float TurnSpeedDegPerFrame = 0.08f;
 
     [Tooltip("Word 27 – Tank Max Turn Pivot Angle (degrees) above which we decelerate.")]
-    public float word27_MaxTurnPivotDeg = 10f;
+    public float MaxTurnPivotDeg = 10f;
 
     [Tooltip("Word 28 – Obstacle Awareness (Movement) look-ahead factor (frames). N = Word28 / 2.")]
-    public int word28_ObstacleAwareness = 30;
+    public int ObstacleAwareness = 30;
 
     private bool enable;
     public override bool Enable
@@ -121,7 +116,7 @@ public class TankMovementAI : EnemyAI
 
     void Awake()
     {
-        movementQueue = new MovementQueue(word22_QueueCount);
+        movementQueue = new MovementQueue(QueueCapacity);
         if (agent == null) agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -171,7 +166,7 @@ public class TankMovementAI : EnemyAI
     // ───────────────────────── step 1: cadence ─────────────────────────
     private void handleMovementOpportunityCadence()
     {
-        if (word20_SurvivalModeFlag != 0 && DetectThreatsForSurvival())
+        if (SurvivalModeFlag && DetectThreatsForSurvival())
             wantedMove = MoveRequest.Survival;
         else if (IsThereObstacleAhead())
             wantedMove = MoveRequest.Large;
@@ -207,9 +202,9 @@ public class TankMovementAI : EnemyAI
     private void enterAnglesForRandomTurnToQueue()
     {
         Debug.Log("Random");
-        float randomTurnAngle = Random.Range(-word13_RandomTurnMaxAngle, word13_RandomTurnMaxAngle);
+        float randomTurnAngle = Random.Range(-RandomTurnMaxAngle, RandomTurnMaxAngle);
 
-        if (playerTarget && word21_Aggressiveness > 0f)
+        if (playerTarget && Aggressiveness > 0f)
             makeRandomAngleMoreBiasTowardsPlayerPosition(ref randomTurnAngle);
 
         enqueueMiniTurnsRelative(randomTurnAngle, MovementQueue.QueueSource.RandomTurn);
@@ -243,7 +238,7 @@ public class TankMovementAI : EnemyAI
     {
         Vector2 randomDirectionVector = Utils.RotateVector(ForwardDirection, randomAngle).normalized;
         Vector2 toPlayer = Utils.VectorFromOnePointToAnother(hull, playerTarget);
-        Vector2 aggressivenessBiasVector = Utils.SetMagnitude(toPlayer, word21_Aggressiveness);
+        Vector2 aggressivenessBiasVector = Utils.SetMagnitude(toPlayer, Aggressiveness);
         Vector2 adjustedDirectionVector = randomDirectionVector + aggressivenessBiasVector;
         randomAngle = Utils.VectorToAngle(adjustedDirectionVector.normalized);
     }
@@ -256,8 +251,7 @@ public class TankMovementAI : EnemyAI
 
         moveForwardThisFrame = Mathf.Abs(deltaToTarget) <= 90f;
 
-        float degPerFrame = word26_TurnSpeedRadPerFrame * Mathf.Rad2Deg;
-        float degPerSecond = degPerFrame * simulationFps;
+        float degPerSecond = TurnSpeedDegPerFrame * offset;
         float step = degPerSecond * Time.deltaTime;
 
         if (Mathf.Abs(deltaToTarget) <= step)
@@ -269,7 +263,7 @@ public class TankMovementAI : EnemyAI
     // ───────────────────────── step 4: request speed ─────────────────────────
     private void ComputeRequestedSpeed()
     {
-        requestedSpeed = Mathf.Max(0f, word23_MaxSpeed);
+        requestedSpeed = Mathf.Max(0f, MaxSpeed);
     }
 
     // ───────────────────────── step 5: accel/decel/stuns/clamp ─────────────────────────
@@ -277,19 +271,19 @@ public class TankMovementAI : EnemyAI
     {
         float requiredTurnNow = Mathf.Abs(Mathf.DeltaAngle(getFacingAngleDeg(), turnTargetAngleDeg));
 
-        if (requiredTurnNow > word27_MaxTurnPivotDeg || requestedSpeed < currentVelocity)
+        if (requiredTurnNow > MaxTurnPivotDeg || requestedSpeed < currentVelocity)
         {
-            currentVelocity *= Mathf.Clamp01(word12_DecelMul);
+            currentVelocity *= Mathf.Clamp01(DecelerationMultiplier);
         }
         else if (requestedSpeed > currentVelocity)
         {
-            currentVelocity += word11_Accel;
+            currentVelocity += Acceleration;
         }
 
         if (bulletStunTimerFrames > 0 || mineStunTimerFrames > 0)
             currentVelocity = 0f;
 
-        currentVelocity = Mathf.Min(currentVelocity, word23_MaxSpeed);
+        currentVelocity = Mathf.Min(currentVelocity, MaxSpeed);
 
         if (bulletStunTimerFrames > 0) bulletStunTimerFrames--;
         if (mineStunTimerFrames > 0) mineStunTimerFrames--;
@@ -299,7 +293,7 @@ public class TankMovementAI : EnemyAI
     private void MoveAgentAlongCurrentFacing()
     {
         Vector2 dir2D = hull.up * (moveForwardThisFrame ? 1f : -1f);
-        float unitsPerSecond = currentVelocity * simulationFps * internalUnitsToUnity;
+        float unitsPerSecond = currentVelocity * offset;
 
         agent.speed = unitsPerSecond;
 
@@ -312,8 +306,8 @@ public class TankMovementAI : EnemyAI
 
     private int pickNewRandomTurningValue()
     {
-        int a = word14_TimerA;
-        int b = word15_TimerB;
+        int a = TimerA;
+        int b = TimerB;
         if (a == b)
         {
             return a;
@@ -325,20 +319,20 @@ public class TankMovementAI : EnemyAI
 
     private bool DetectThreatsForSurvival()
     {
-        bool aiMine = word16_AIMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, word16_AIMineAwareness * internalUnitsToUnity, aiMineMask);
-        bool aiBullet = word17_AIBulletAwareness > 0f && AnyBulletHeadingTowardsMe(aiBulletMask, word17_AIBulletAwareness, "Enemy");
-        bool playerMine = word18_PlayerMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, word18_PlayerMineAwareness * internalUnitsToUnity, playerMineMask);
-        bool playerBullet = word19_PlayerBulletAwareness > 0f && AnyBulletHeadingTowardsMe(playerBulletMask, word19_PlayerBulletAwareness, "Player");
+        bool aiMine = EnemyMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, EnemyMineAwareness * internalUnitsToUnity, aiMineMask);
+        bool aiBullet = EnemyBulletAwareness > 0f && AnyBulletHeadingTowardsMe(aiBulletMask, EnemyBulletAwareness, "Enemy");
+        bool playerMine = PlayerMineAwareness > 0f && Physics2D.OverlapCircle(hull.position, PlayerMineAwareness * internalUnitsToUnity, playerMineMask);
+        bool playerBullet = PlayerBulletAwareness > 0f && AnyBulletHeadingTowardsMe(playerBulletMask, PlayerBulletAwareness, "Player");
         return aiMine || aiBullet || playerMine || playerBullet;
     }
 
     private Vector2 ComputeSurvivalEscapeVector()
     {
         Vector2 sum = Vector2.zero;
-        AccumulateInverseVectors(word16_AIMineAwareness, ref sum, aiMineMask, "Enemy");
-        AccumulateInverseVectors(word18_PlayerMineAwareness, ref sum, playerMineMask, "Player");
-        AccumulateInverseVectors(word17_AIBulletAwareness, ref sum, aiBulletMask, "Enemy", checkHeadingTowardsMe: true);
-        AccumulateInverseVectors(word19_PlayerBulletAwareness, ref sum, playerBulletMask, "Player", checkHeadingTowardsMe: true);
+        AccumulateInverseVectors(EnemyMineAwareness, ref sum, aiMineMask, "Enemy");
+        AccumulateInverseVectors(PlayerMineAwareness, ref sum, playerMineMask, "Player");
+        AccumulateInverseVectors(EnemyBulletAwareness, ref sum, aiBulletMask, "Enemy", checkHeadingTowardsMe: true);
+        AccumulateInverseVectors(PlayerBulletAwareness, ref sum, playerBulletMask, "Player", checkHeadingTowardsMe: true);
         //AccumulateInverseVectors(getlookDistance(), ref sum, LayerMask.GetMask("Walls"));
         return sum.normalized;
     }
@@ -425,9 +419,9 @@ public class TankMovementAI : EnemyAI
 
     private float getlookDistance()
     {
-        float N = Mathf.Max(0f, word28_ObstacleAwareness / 2f);
+        float N = Mathf.Max(0f, ObstacleAwareness / 2f);
         float lookDistInternal = Mathf.Max(1f, currentVelocity * N + 2f);
-        return lookDistInternal * internalUnitsToUnity;
+        return lookDistInternal;
     }
 
     bool IsThereObstacleAhead(float lookingDistance)
@@ -435,7 +429,6 @@ public class TankMovementAI : EnemyAI
         Vector3 start = hull.position;
         Vector3 end = start + hull.up * lookingDistance;
         return Physics2D.Raycast(start, hull.up, lookingDistance, LayerMask.GetMask("Walls"));
-        //return agent.Raycast(end, out _);
     }
 
     bool IsThereObstacleAhead()

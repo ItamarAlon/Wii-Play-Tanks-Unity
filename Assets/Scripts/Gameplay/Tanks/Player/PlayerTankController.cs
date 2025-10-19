@@ -14,15 +14,15 @@ namespace Game.Gameplay.Tanks.Shared
         public Transform turret;
         public Mine minePrefab;
         public KeyCode fireKey = KeyCode.Mouse0;
-        public KeyCode mineKey = KeyCode.E;
+        //public KeyCode mineKey = KeyCode.E;
 
         private TankMotor _motor;
-        private Camera _cam;
+        //private Camera _cam;
 
         void Awake()
         {
             _motor = GetComponent<TankMotor>();
-            _cam = Camera.main;
+            //_cam = Camera.main;
         }
 
         void Update()
@@ -35,10 +35,10 @@ namespace Game.Gameplay.Tanks.Shared
                 shooter.TryFire();
             }
 
-            if (Input.GetKeyDown(mineKey) && minePrefab)
-            {
-                Instantiate(minePrefab, transform.position, Quaternion.identity);
-            }
+            //if (Input.GetKeyDown(mineKey) && minePrefab)
+            //{
+            //    Instantiate(minePrefab, transform.position, Quaternion.identity);
+            //}
         }
     }
 }

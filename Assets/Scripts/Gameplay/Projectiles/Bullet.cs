@@ -33,10 +33,10 @@ namespace Game.Gameplay.Projectiles
             string layer = LayerMask.LayerToName(col.collider.gameObject.layer);
             if (layer == "Tank" || layer == "Bullet" || layer == "Mines")
             {
-                var health = col.collider.GetComponentInParent<Health>();
-                if (health && extraCheck(health))
-                    health.Kill();
-                Despawn();
+                if (layer == "Tank")
+                    killIfNeeded(col, true);
+                else
+                    killIfNeeded(col, false);
                 return;
             }
 
@@ -48,6 +48,15 @@ namespace Game.Gameplay.Projectiles
                 return;
             }
             Despawn();
+        }
+
+        private void killIfNeeded(Collision2D col, bool doExtraCheck)
+        {
+            var health = col.collider.GetComponentInParent<Health>();
+            if (health && (!doExtraCheck || extraCheck(health)))
+                health.Kill();
+            Despawn();
+            return;
         }
 
         private bool extraCheck(Health hit)

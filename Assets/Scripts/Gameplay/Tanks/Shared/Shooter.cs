@@ -97,6 +97,8 @@ namespace Game.Gameplay.Tanks.Shared
             Bullet bullet = Instantiate(BulletPrefab, Muzzle.position, Quaternion.identity);
             bullet.tag = isPlayer ? "Player" : "Enemy";
             bullet.SetOwner(this);
+            bullet.MaxBounces = MaxBounces;
+            bullet.KillsOwnKind = killsOwnKind;
             applyTintToBullet(bullet);
             return bullet;
         }

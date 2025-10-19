@@ -147,7 +147,7 @@ MonoBehaviour:
   cooldownSeconds: 0.25
   maxActive: 1
   isPlayer: 0
-  killsOwnKind: 1
+  killsOwnKind: 0
 --- !u!195 &3743735772750004465
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -184,24 +184,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 3743735772750004465}
   hull: {fileID: 4542270977892972629}
-  internalUnitsToUnity: 1
-  simulationFps: 60
-  word11_Accel: 0.3
-  word12_DecelMul: 0.6
-  word13_RandomTurnMaxAngle: 30
-  word14_TimerA: 90
-  word15_TimerB: 150
-  word16_AIMineAwareness: 120
-  word17_AIBulletAwareness: 120
-  word18_PlayerMineAwareness: 0
-  word19_PlayerBulletAwareness: 40
-  word20_SurvivalModeFlag: 1
-  word21_Aggressiveness: 0.08
-  word22_QueueCount: 4
-  word23_MaxSpeed: 0.02
-  word26_TurnSpeedRadPerFrame: 0.02
-  word27_MaxTurnPivotDeg: 50
-  word28_ObstacleAwareness: 30
+  internalUnitsToUnity: 0.2
+  Acceleration: 0.3
+  DecelerationMultiplier: 0.6
+  RandomTurnMaxAngle: 30
+  TimerA: 300
+  TimerB: 350
+  EnemyMineAwareness: 120
+  EnemyBulletAwareness: 0
+  PlayerMineAwareness: 0
+  PlayerBulletAwareness: 40
+  SurvivalModeFlag: 1
+  Aggressiveness: 0.08
+  QueueCapacity: 4
+  MaxSpeed: 0.02
+  TurnSpeedDegPerFrame: 1.145
+  MaxTurnPivotDeg: 50
+  ObstacleAwareness: 30
   aiBulletMask:
     serializedVersion: 2
     m_Bits: 256
@@ -231,9 +230,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turretPivot: {fileID: 4478932648053384618}
   target: {fileID: 0}
-  word29_TurretAngleOffset: 40
-  word39_TurretTurnSpeedRadPerFrame: 0.03
-  word40_TurretTargetTimer: 90
+  turretAngleRangeOffset: 40
+  turretTurnSpeedDeg: 0
+  turretTargetTimer: 90
   alwaysEnabled: 1
 --- !u!114 &6375145360895304136
 MonoBehaviour:
